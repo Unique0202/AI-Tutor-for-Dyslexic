@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice Tutor</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        textarea { width: 80%; height: 100px; margin-top: 10px; }
+        button { margin: 10px; padding: 10px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h2>AI-Powered Voice Tutor</h2>
+    <textarea id="textInput" placeholder="Speak or type here..."></textarea>
+    <br>
+    <button onclick="startSpeechRecognition()">🎤 Speak</button>
+    <button onclick="speakText()">🔊 Listen</button>
+    <button onclick="getAIResponse()">🧠 Get AI Feedback</button>
+    <p><strong>AI Response:</strong> <span id="aiResponse">(Your feedback will appear here)</span></p>
+
+    <script>
+        function startSpeechRecognition() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.start();
+            recognition.onresult = (event) => {
+                document.getElementById('textInput').value = event.results[0][0].transcript;
+            };
+        }
+
+        function speakText() {
+            let text = document.getElementById("textInput").value;
+            let speech = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(speech);
+        }
+
+        async function getAIResponse() {
+            let text = document.getElementById("textInput").value;
+            document.getElementById("aiResponse").innerText = "Processing...";
+            
+            // Replace 'YOUR_OPENAI_API_KEY' with your actual API key
+            let response = await fetch("https://api.openai.com/v1/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer YOUR_OPENAI_API_KEY"
+                },
+                body: JSON.stringify({
+                    model: "gpt-4",
+                    prompt: `Correct the following and provide a brief explanation: ${text}`,
+                    max_tokens: 100
+                })
+            });
+            
+            let data = await response.json();
+            let aiText = data.choices[0].text.trim();
+            document.getElementById("aiResponse").innerText = aiText;
+            
+            // Speak the AI response
+            let speech = new SpeechSynthesisUtterance(aiText);
+            window.speechSynthesis.speak(speech);
+        }
+    </script>
+</body>
+</html>
