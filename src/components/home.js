@@ -39,6 +39,16 @@ function Home() {
     }
   ];
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // Implement search functionality
+    console.log("Searching for:", searchQuery);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setScrollY(window.scrollY);
@@ -144,6 +154,71 @@ function Home() {
 
   return (
     <div className="app-container" ref={containerRef}>
+
+{/* New Taskbar/Navigation Bar */}
+<nav className="taskbar">
+        <div className="taskbar-container">
+          {/* Logo/Brand */}
+          <Link to="/" className="taskbar-brand">
+            <span className="logo-icon">📚</span>
+            <span className="logo-text">NeuroLearn</span>
+          </Link>
+
+          {/* Mobile Menu Button */}
+          <button 
+            className="mobile-menu-button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            ☰
+          </button>
+
+          {/* Navigation Links */}
+          <div className={`taskbar-links ${mobileMenuOpen ? 'open' : ''}`}>
+            <Link to="/learning-games" className="taskbar-link">Learning Games</Link>
+            <Link to="/progress" className="taskbar-link">My Progress</Link>
+            <Link to="/resources" className="taskbar-link">Resources</Link>
+            <Link to="/about" className="taskbar-link">About</Link>
+          </div>
+
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="taskbar-search">
+            <input
+              type="text"
+              placeholder="Search lessons..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search"
+            />
+            <button type="submit" aria-label="Search">
+              🔍
+            </button>
+          </form>
+
+          {/* User Section */}
+          <div className="taskbar-user">
+            <button 
+              className="user-button"
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
+              aria-label="User menu"
+            >
+              <span className="user-avatar">👤</span>
+            </button>
+            
+            {userMenuOpen && (
+              <div className="user-menu">
+                <Link to="/profile" className="user-menu-item">My Profile</Link>
+                <Link to="/settings" className="user-menu-item">Settings</Link>
+                <div className="user-menu-divider"></div>
+                <Link to="/login" className="user-menu-item">Login</Link>
+                <Link to="/signup" className="user-menu-item signup">Sign Up</Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+
+
       {/* Hero Section with Parallax */}
       <section className="hero">
         <div 
