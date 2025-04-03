@@ -82,6 +82,66 @@ function Home() {
     }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
   };
 
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+
+  // Function to handle testimonial change
+  const testimonials = [
+    {
+      quote: "This changed how I see learning. For the first time, reading feels possible.",
+      name: "Mudit",
+      age: 12,
+      role: "Student",
+      avatar: "👦"
+    },
+    {
+      quote: "The games make learning so much fun! I don't feel stressed anymore.",
+      name: "Priya",
+      age: 10,
+      role: "Student",
+      avatar: "👧"
+    },
+    {
+      quote: "As a teacher, I've seen remarkable progress in my students using this platform.",
+      name: "Mr. Sharma",
+      age: "",
+      role: "Teacher",
+      avatar: "👨‍🏫"
+    },
+    {
+      quote: "My child's confidence has grown tremendously since using these learning tools.",
+      name: "Mrs. Patel",
+      age: "",
+      role: "Parent",
+      avatar: "👩"
+    }
+  ];
+
+  const nextTestimonial = () => {
+    setCurrentTestimonial((prev) => 
+      prev === testimonials.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevTestimonial = () => {
+    setCurrentTestimonial((prev) => 
+      prev === 0 ? testimonials.length - 1 : prev - 1
+    );
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowRight") {
+        nextTestimonial();
+      } else if (e.key === "ArrowLeft") {
+        prevTestimonial();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <div className="app-container" ref={containerRef}>
       {/* Hero Section with Parallax */}
@@ -175,20 +235,63 @@ function Home() {
 
       {/* Testimonial Section */}
       <section className="testimonial">
-        <div className="testimonial-content">
-          <blockquote>
-            "This changed how I see learning. For the first time, reading feels possible."
-          </blockquote>
-          <div className="testimonial-author">
-            <div className="author-avatar">👦</div>
-            <div className="author-info">
-              <p className="author-name">Jamie, 12</p>
-              <p className="author-role">Student</p>
-            </div>
+        <div className="testimonial-header">
+          <h2>What People Say</h2>
+          <div className="testimonial-controls">
+            <button 
+              className="testimonial-nav prev" 
+              onClick={prevTestimonial}
+              aria-label="Previous testimonial"
+            >
+              &larr;
+            </button>
+            <button 
+              className="testimonial-nav next" 
+              onClick={nextTestimonial}
+              aria-label="Next testimonial"
+            >
+              &rarr;
+            </button>
           </div>
         </div>
-      </section>
 
+        <div className="testimonial-carousel-container">
+          <div className="testimonial-carousel">
+            {testimonials.map((testimonial, index) => (
+              <div 
+                key={index} 
+                className={`testimonial-slide ${index === currentTestimonial ? 'active' : ''}`}
+                aria-hidden={index !== currentTestimonial}
+              >
+                <div className="testimonial-content">
+                  <blockquote>"{testimonial.quote}"</blockquote>
+                  <div className="testimonial-author">
+                    <div className="author-avatar">{testimonial.avatar}</div>
+                    <div className="author-info">
+                      <p className="author-name">
+                        {testimonial.name}{testimonial.age && `, ${testimonial.age}`}
+                      </p>
+                      <p className="author-role">{testimonial.role}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+          
+        <div className="testimonial-dots">
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              className={`dot ${index === currentTestimonial ? 'active' : ''}`}
+              onClick={() => setCurrentTestimonial(index)}
+              aria-label={`Go to testimonial ${index + 1}`}
+            />
+          ))}
+        </div>
+      </section>
+        
       {/* Chatbot Components */}
       <div 
         className={`chatbot-icon ${chatOpen ? 'active' : ''}`} 
