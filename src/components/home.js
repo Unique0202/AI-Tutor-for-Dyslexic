@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+
 
 function Home() {
   const [activePanel, setActivePanel] = useState(0);
@@ -66,30 +68,89 @@ function Home() {
     setChatOpen(!chatOpen);
   };
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (inputValue.trim() === "") return;
-
+    if (!inputValue.trim()) return;
+  
     // Add user message
-    setMessages([...messages, { text: inputValue, sender: "user" }]);
+    const userMessage = { text: inputValue, sender: "user" };
+    setMessages(prev => [...prev, userMessage]);
     setInputValue("");
-
-    // Simulate bot response after a delay
-    setTimeout(() => {
-      const botResponses = [
-        "That's a great question! I can help explain any of the learning games on this page.",
-        "I'm here to help with your learning journey! Which game would you like to know more about?",
-        "I'm still learning too! Right now I can tell you about the different learning activities available.",
-        "Try clicking on any of the learning games to explore them. I can answer questions about them!",
-        "For more detailed help, you might want to ask your teacher about that one."
-      ];
-      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-      
-      setMessages(prev => [...prev, { 
-        text: randomResponse, 
-        sender: "bot" 
-      }]);
-    }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+  
+    // Add loading message
+    const loadingMessage = { text: "Thinking...", sender: "bot" };
+    setMessages(prev => [...prev, loadingMessage]);
+  
+    try {
+      // First try the Hugging Face API
+      const response = await axios.post(
+        "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill",
+        { 
+          inputs: {
+            past_user_inputs: [],
+            text: inputValue,
+          } 
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.REACT_APP_HUGGINGFACE_API_KEY}`,
+          },
+          timeout: 10000 // 10 second timeout
+        }
+      );
+  
+      const botResponse = response.data?.generated_text 
+        ? response.data.generated_text
+        : getLocalResponse(inputValue); // Fallback if empty response
+  
+      // Replace loading message
+      setMessages(prev => [
+        ...prev.slice(0, -1),
+        { text: botResponse, sender: "bot" }
+      ]);
+  
+    } catch (error) {
+      console.error("API Error:", error);
+      // Use local response if API fails
+      const localResponse = getLocalResponse(inputValue);
+      setMessages(prev => [
+        ...prev.slice(0, -1),
+        { text: localResponse, sender: "bot" }
+      ]);
+    }
+  };
+  
+  // Local response system for your learning app
+  const getLocalResponse = (userInput) => {
+    const input = userInput.toLowerCase();
+    
+    // Learning module questions
+    if (input.includes('reading') || input.includes('read') || input.includes('book')) {
+      return "Our Reading Adventure module helps with story comprehension. Would you like to try it?";
+    }
+    if (input.includes('letter') || input.includes('alphabet')) {
+      return "Letter Master is perfect for learning letters! It's in the learning games section.";
+    }
+    if (input.includes('word') || input.includes('spell') || input.includes('vocab')) {
+      return "Try Word Builder or Spell Quest for word practice!";
+    }
+  
+    // General questions
+    if (input.includes('help') || input.includes('support')) {
+      return "I can help with: 1) Reading 2) Spelling 3) Letters 4) Words. What would you like help with?";
+    }
+    if (input.includes('hello') || input.includes('hi')) {
+      return "Hello! Ready to learn something new today?";
+    }
+  
+    // Default responses
+    const defaultResponses = [
+      "I specialize in reading and spelling help. Could you ask about those?",
+      "Try asking about our learning modules: Reading, Letters, or Spelling!",
+      "I'm best at answering questions about our learning games and exercises."
+    ];
+    
+    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
   };
 
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -207,7 +268,7 @@ function Home() {
             
             {userMenuOpen && (
               <div className="user-menu">
-                <Link to="/profile" className="user-menu-item">My Profile</Link>
+                <Link to="/Profile" className="user-menu-item">My Profile</Link>
                 <Link to="/settings" className="user-menu-item">Settings</Link>
                 <div className="user-menu-divider"></div>
                 <Link to="/login" className="user-menu-item">Login</Link>
@@ -362,9 +423,10 @@ function Home() {
               className={`dot ${index === currentTestimonial ? 'active' : ''}`}
               onClick={() => setCurrentTestimonial(index)}
               aria-label={`Go to testimonial ${index + 1}`}
-            />
+            ></button>
           ))}
         </div>
+
       </section>
         
       {/* Chatbot Components */}
@@ -415,3 +477,4 @@ function Home() {
 }
 
 export default Home;
+
