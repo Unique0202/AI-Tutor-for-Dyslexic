@@ -1,0 +1,316 @@
+/* GamesPage.css */
+
+/* Base Styles */
+.games-page {
+  font-family: 'Open Dyslexic', 'Comic Sans', Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+}
+
+/* Header Section */
+.games-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #e0e6ed;
+}
+
+.games-title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #3a5a78;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.games-subtitle {
+  font-size: 1.2rem;
+  color: #64748b;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Filters Section */
+.games-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  align-items: center;
+}
+
+.search-bar {
+  flex: 1;
+  min-width: 250px;
+  position: relative;
+  max-width: 500px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 3rem;
+  border: 2px solid #e0e6ed;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #4a6fa5;
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+}
+
+.filter-dropdown {
+  position: relative;
+  min-width: 200px;
+}
+
+.filter-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  pointer-events: none;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 3rem;
+  border: 2px solid #e0e6ed;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-family: inherit;
+  appearance: none;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #4a6fa5;
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+}
+
+/* Games List */
+.games-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.game-item {
+  text-decoration: none;
+  color: inherit;
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.game-preview {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.game-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.game-item:hover .game-image {
+  transform: scale(1.05);
+}
+
+.game-icon-overlay {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: rgba(255,255,255,0.9);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.game-details {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-item-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.8rem;
+  color: #3a5a78;
+}
+
+.game-item-description {
+  color: #64748b;
+  margin-bottom: 1.5rem;
+  flex: 1;
+}
+
+.game-meta {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.game-tag {
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Category Tags */
+.category-reading {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.category-spelling {
+  background-color: #f0fdf4;
+  color: #15803d;
+}
+
+.category-grammar {
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+.category-letters {
+  background-color: #f5f3ff;
+  color: #7c3aed;
+}
+
+/* Difficulty Tags */
+.difficulty-beginner {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.difficulty-intermediate {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.difficulty-advanced {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.difficulty-all-levels {
+  background-color: #f5f3ff;
+  color: #7c3aed;
+}
+
+/* No Games Found */
+.no-games {
+  text-align: center;
+  padding: 3rem;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  margin-top: 2rem;
+}
+
+.no-games p {
+  font-size: 1.2rem;
+  color: #64748b;
+  margin-bottom: 1.5rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  background-color: #4a6fa5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background-color: #3a5a78;
+  transform: translateY(-2px);
+}
+
+/* Accessibility Features */
+.game-item:focus {
+  outline: 3px solid #4a6fa5;
+  outline-offset: 3px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .games-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-bar, .filter-dropdown {
+    max-width: 100%;
+  }
+  
+  .games-list {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .games-page {
+    padding: 1rem;
+  }
+  
+  .games-title {
+    font-size: 2rem;
+  }
+  
+  .games-subtitle {
+    font-size: 1rem;
+  }
+  
+  .games-list {
+    grid-template-columns: 1fr;
+  }
+}

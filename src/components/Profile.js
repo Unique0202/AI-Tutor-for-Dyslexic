@@ -6,10 +6,10 @@ import "../profile.css";
 function Profile() {
   const [activeTab, setActiveTab] = useState("progress");
   const [userData, setUserData] = useState({
-    name: "Alex Johnson",
-    email: "alex.johnson@example.com",
+    name: "Mudit Pandey",
+    email: "mudit23329@iiitd.ac.in",
     avatar: "👨‍🎓",
-    joinDate: "January 2023",
+    joinDate: "March 2025",
     learningStyle: "Visual Learner",
     readingLevel: "Intermediate",
     achievements: 15,
@@ -321,13 +321,13 @@ function Profile() {
                   <div className="achievement-icon">🏆</div>
                   <h3>Reading Explorer</h3>
                   <p>Completed 10 reading exercises</p>
-                  <div className="achievement-date">Earned: Feb 15, 2023</div>
+                  <div className="achievement-date">Earned: Mar 15, 2025</div>
                 </div>
                 <div className="achievement-card">
                   <div className="achievement-icon">⭐</div>
                   <h3>Letter Master</h3>
                   <p>Recognized all letters of the alphabet</p>
-                  <div className="achievement-date">Earned: Jan 28, 2023</div>
+                  <div className="achievement-date">Earned: Apr 2, 2025</div>
                 </div>
                 <div className="achievement-card">
                   <div className="achievement-icon">🎯</div>

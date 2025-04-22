@@ -1,0 +1,243 @@
+/* Header.css */
+
+/* Base Header Styles */
+.header {
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  font-family: 'Open Dyslexic', 'Comic Sans', Arial, sans-serif;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  position: relative;
+}
+
+/* Logo Styles */
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  gap: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.logo-icon {
+  font-size: 1.8rem;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #3a5a78;
+  letter-spacing: 0.05em;
+}
+
+/* Header Buttons Container */
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Menu Button Styles */
+.menu-button, 
+.accessibility-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: #3a5a78;
+}
+
+.menu-button:hover, 
+.accessibility-button:hover {
+  background-color: #f0f4f8;
+  color: #4a6fa5;
+  transform: scale(1.1);
+}
+
+.menu-button:focus, 
+.accessibility-button:focus {
+  outline: 3px solid #4a6fa5;
+  outline-offset: 2px;
+}
+
+/* Navigation Styles */
+.main-nav {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 100%;
+  max-width: 300px;
+  background-color: white;
+  box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 0 12px;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.main-nav.open {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 1rem 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin: 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  text-decoration: none;
+  color: #3a5a78;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+}
+
+.nav-link:hover {
+  background-color: #f0f4f8;
+  color: #4a6fa5;
+  border-left-color: #4a6fa5;
+}
+
+.nav-link.active {
+  background-color: #e6f0fa;
+  color: #4a6fa5;
+  border-left-color: #4a6fa5;
+}
+
+.nav-link span {
+  letter-spacing: 0.05em;
+}
+
+/* Accessibility Menu Position */
+.accessibility-menu-container {
+  position: absolute;
+  top: 100%;
+  right: 2rem;
+  z-index: 1000;
+}
+
+/* Focus States for Accessibility */
+a:focus, button:focus, .nav-link:focus {
+  outline: 3px solid #4a6fa5;
+  outline-offset: 3px;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .header-container {
+    padding: 1rem 2rem;
+  }
+
+  .menu-button {
+    display: none;
+  }
+
+  .main-nav {
+    position: static;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+    width: auto;
+    max-width: none;
+    background: none;
+    box-shadow: none;
+  }
+
+  .nav-list {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0;
+  }
+
+  .nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+  }
+
+  .nav-link:hover {
+    border-left: none;
+    border-bottom-color: #4a6fa5;
+  }
+
+  .nav-link.active {
+    border-left: none;
+    border-bottom-color: #4a6fa5;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nav-list {
+    gap: 1rem;
+  }
+
+  .nav-link {
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+/* Animation for Menu */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.main-nav.open .nav-item {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.main-nav.open .nav-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.main-nav.open .nav-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.main-nav.open .nav-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.main-nav.open .nav-item:nth-child(4) {
+  animation-delay: 0.4s;
+}

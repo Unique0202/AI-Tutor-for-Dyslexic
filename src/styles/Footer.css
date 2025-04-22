@@ -1,0 +1,146 @@
+/* Footer.css */
+
+/* Base Footer Styles */
+.footer {
+  background-color: #3a5a78;
+  color: #ffffff;
+  padding: 3rem 0 0;
+  font-family: 'Open Dyslexic', 'Comic Sans', Arial, sans-serif;
+  line-height: 1.6;
+  letter-spacing: 0.05em;
+}
+
+.footer-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+/* Footer Sections */
+.footer-section {
+  margin-bottom: 2rem;
+}
+
+.footer-heading {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.footer-heading::after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 3px;
+  background-color: #06d6a0;
+  margin-top: 0.5rem;
+}
+
+.footer-text {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+}
+
+/* Footer Links */
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 0.8rem;
+}
+
+.footer-links a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  display: inline-block;
+  padding: 0.2rem 0;
+  position: relative;
+}
+
+.footer-links a:hover {
+  color: #ffffff;
+  transform: translateX(5px);
+}
+
+.footer-links a::before {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #06d6a0;
+  transition: width 0.3s ease;
+}
+
+.footer-links a:hover::before {
+  width: 100%;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+  background-color: #2c3e50;
+  padding: 1.5rem 0;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.footer-bottom p {
+  margin: 0;
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+/* Focus States for Accessibility */
+.footer-links a:focus {
+  outline: 3px solid #06d6a0;
+  outline-offset: 3px;
+  color: #ffffff;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .footer-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+  }
+  
+  .footer-section:first-child {
+    grid-column: 1 / 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer {
+    padding: 4rem 0 0;
+  }
+  
+  .footer-container {
+    padding: 0 4rem;
+  }
+}
+
+/* Animation for Links */
+@keyframes linkUnderline {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.footer-links a:hover::before {
+  animation: linkUnderline 0.3s ease forwards;
+}

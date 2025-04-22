@@ -84,7 +84,7 @@ function Home() {
     try {
       // First try the Hugging Face API
       const response = await axios.post(
-        "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill",
+        "https://router.huggingface.co/hf-inference/models/facebook/blenderbot-400M-distill",
         { 
           inputs: {
             past_user_inputs: [],

@@ -1,0 +1,255 @@
+.spell-quest {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .game-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+    background-color: white;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  .level-display,
+  .score-display,
+  .hints-display {
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+  
+  .level-display {
+    color: var(--primary-color);
+  }
+  
+  .score-display {
+    color: var(--success-color);
+  }
+  
+  .hints-display {
+    color: var(--warning-color);
+  }
+  
+  .spell-challenge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    margin-bottom: 24px;
+  }
+  
+  .challenge-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  
+  .challenge-header h2 {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin-bottom: 12px;
+  }
+  
+  .word-definition {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    max-width: 600px;
+    line-height: 1.6;
+  }
+  
+  .audio-player {
+    margin-bottom: 32px;
+  }
+  
+  .audio-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .audio-button:hover {
+    background-color: #3a5a84;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(74, 111, 165, 0.2);
+  }
+  
+  .spelling-input {
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 24px;
+  }
+  
+  .word-input {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.5rem;
+    text-align: center;
+    border: 3px solid var(--primary-color);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    font-family: var(--font-family);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .word-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+  }
+  
+  .input-actions {
+    display: flex;
+    gap: 16px;
+  }
+  
+  .hint-button, 
+  .check-button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .hint-button {
+    background-color: var(--warning-color);
+    color: #333;
+  }
+  
+  .hint-button:hover:not(:disabled) {
+    background-color: #e5b73b;
+  }
+  
+  .hint-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .check-button {
+    background-color: var(--success-color);
+    color: white;
+  }
+  
+  .check-button:hover:not(:disabled) {
+    background-color: #05b183;
+  }
+  
+  .check-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .hint-display {
+    background-color: rgba(255, 209, 102, 0.2);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+  }
+  
+  .feedback {
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+    font-weight: 500;
+    animation: fadeIn 0.5s ease;
+  }
+  
+  .feedback.success {
+    background-color: rgba(6, 214, 160, 0.2);
+    color: var(--success-color);
+  }
+  
+  .feedback.warning {
+    background-color: rgba(255, 209, 102, 0.2);
+    color: #d4a10d;
+  }
+  
+  .feedback.error {
+    background-color: rgba(239, 71, 111, 0.2);
+    color: var(--error-color);
+  }
+  
+  .feedback.info {
+    background-color: rgba(74, 111, 165, 0.2);
+    color: var(--primary-color);
+  }
+  
+  .attempts-counter {
+    color: var(--text-color-light);
+    margin-bottom: 16px;
+  }
+  
+  .next-word-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: none;
+    border: 2px solid #ccc;
+    color: var(--text-color-light);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .next-word-button:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .game-info {
+      flex-direction: column;
+      gap: 8px;
+      text-align: center;
+    }
+    
+    .spell-challenge {
+      padding: 24px 16px;
+    }
+    
+    .word-definition {
+      font-size: 1.1rem;
+    }
+    
+    .input-actions {
+      flex-direction: column;
+    }
+  }
