@@ -35,7 +35,7 @@ const Header = () => {
       <div className="header-container">
         <Link to="/" className="logo" onClick={() => speak('Home page')}>
           <span className="logo-icon">🧠</span>
-          <span className="logo-text">DyslexiLearn</span>
+          <span className="logo-text">NeuroLearn</span>
         </Link>
         
         <div className="header-buttons">

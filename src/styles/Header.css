@@ -1,32 +1,45 @@
 /* Header.css */
 
-/* Base Header Styles */
 .header {
-  background-color: #ffffff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --primary-color: #6c5ce7;
+  --secondary-color: #00cec9;
+  --accent-color: #fd79a8;
+  --dark-bg: #1a1a2e;
+  --darker-bg: #16213e;
+  --card-bg: #0f3460;
+  --text-light: #e6e6e6;
+  --text-lighter: #ffffff;
+  --text-muted: #b8b8b8;
+  --transition-speed: 0.3s;
+  --header-height: 70px;
+  background-color: var(--darker-bg);
+  color: var(--text-light);
   position: sticky;
   top: 0;
   z-index: 1000;
-  font-family: 'Open Dyslexic', 'Comic Sans', Arial, sans-serif;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem 2rem;
-  position: relative;
+  padding: 0 2rem;
+  height: var(--header-height);
 }
 
-/* Logo Styles */
 .logo {
   display: flex;
   align-items: center;
-  text-decoration: none;
   gap: 0.75rem;
-  transition: transform 0.3s ease;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--text-lighter);
+  transition: transform var(--transition-speed) ease;
 }
 
 .logo:hover {
@@ -38,68 +51,60 @@
 }
 
 .logo-text {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #3a5a78;
-  letter-spacing: 0.05em;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Header Buttons Container */
 .header-buttons {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-/* Menu Button Styles */
-.menu-button, 
+.menu-button,
 .accessibility-button {
-  background: none;
+  background: transparent;
   border: none;
+  color: var(--text-light);
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 50%;
+  transition: all var(--transition-speed) ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-  color: #3a5a78;
 }
 
-.menu-button:hover, 
+.menu-button:hover,
 .accessibility-button:hover {
-  background-color: #f0f4f8;
-  color: #4a6fa5;
-  transform: scale(1.1);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-lighter);
 }
 
-.menu-button:focus, 
+.menu-button:focus,
 .accessibility-button:focus {
-  outline: 3px solid #4a6fa5;
+  outline: 2px solid var(--accent-color);
   outline-offset: 2px;
 }
 
-/* Navigation Styles */
+/* Navigation */
 .main-nav {
-  position: absolute;
-  top: 100%;
-  right: 0;
+  position: fixed;
+  top: var(--header-height);
+  right: -100%;
   width: 100%;
   max-width: 300px;
-  background-color: white;
-  box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.1);
-  border-radius: 0 0 0 12px;
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 100;
+  height: calc(100vh - var(--header-height));
+  background-color: var(--darker-bg);
+  transition: right var(--transition-speed) ease;
+  overflow-y: auto;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .main-nav.open {
-  transform: translateX(0);
-  opacity: 1;
-  pointer-events: auto;
+  right: 0;
 }
 
 .nav-list {
@@ -109,7 +114,7 @@
 }
 
 .nav-item {
-  margin: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .nav-link {
@@ -118,126 +123,77 @@
   gap: 1rem;
   padding: 1rem 2rem;
   text-decoration: none;
-  color: #3a5a78;
-  font-weight: 600;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-  border-left: 4px solid transparent;
+  color: var(--text-light);
+  transition: all var(--transition-speed) ease;
 }
 
 .nav-link:hover {
-  background-color: #f0f4f8;
-  color: #4a6fa5;
-  border-left-color: #4a6fa5;
+  background-color: rgba(108, 92, 231, 0.1);
+  color: var(--text-lighter);
 }
 
 .nav-link.active {
-  background-color: #e6f0fa;
-  color: #4a6fa5;
-  border-left-color: #4a6fa5;
+  background-color: rgba(108, 92, 231, 0.2);
+  color: var(--primary-color);
+  border-left: 3px solid var(--primary-color);
 }
 
-.nav-link span {
-  letter-spacing: 0.05em;
+.nav-link svg {
+  flex-shrink: 0;
 }
 
 /* Accessibility Menu Position */
 .accessibility-menu-container {
-  position: absolute;
-  top: 100%;
-  right: 2rem;
-  z-index: 1000;
-}
-
-/* Focus States for Accessibility */
-a:focus, button:focus, .nav-link:focus {
-  outline: 3px solid #4a6fa5;
-  outline-offset: 3px;
+  position: fixed;
+  top: var(--header-height);
+  right: 1rem;
+  z-index: 1001;
 }
 
 /* Responsive Design */
 @media (min-width: 768px) {
-  .header-container {
-    padding: 1rem 2rem;
-  }
-
   .menu-button {
     display: none;
   }
-
+  
   .main-nav {
     position: static;
-    transform: none;
-    opacity: 1;
-    pointer-events: auto;
     width: auto;
+    height: auto;
     max-width: none;
-    background: none;
-    box-shadow: none;
+    background: transparent;
+    border-left: none;
   }
-
+  
   .nav-list {
     display: flex;
     gap: 0.5rem;
     padding: 0;
   }
-
+  
+  .nav-item {
+    border-bottom: none;
+  }
+  
   .nav-link {
     padding: 0.5rem 1rem;
-    border-radius: 8px;
-    border-left: none;
-    border-bottom: 3px solid transparent;
+    border-radius: 5px;
   }
-
-  .nav-link:hover {
-    border-left: none;
-    border-bottom-color: #4a6fa5;
-  }
-
+  
   .nav-link.active {
     border-left: none;
-    border-bottom-color: #4a6fa5;
+    background-color: var(--primary-color);
+    color: white;
   }
 }
 
-@media (min-width: 1024px) {
-  .nav-list {
-    gap: 1rem;
+/* Reduced Motion */
+@media (prefers-reduced-motion) {
+  .main-nav {
+    transition: none;
   }
-
-  .nav-link {
-    padding: 0.75rem 1.5rem;
+  
+  .logo:hover {
+    transform: none;
   }
-}
-
-/* Animation for Menu */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.main-nav.open .nav-item {
-  animation: slideIn 0.3s ease-out forwards;
-}
-
-.main-nav.open .nav-item:nth-child(1) {
-  animation-delay: 0.1s;
-}
-
-.main-nav.open .nav-item:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.main-nav.open .nav-item:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-.main-nav.open .nav-item:nth-child(4) {
-  animation-delay: 0.4s;
 }

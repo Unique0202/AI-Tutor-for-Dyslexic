@@ -1,195 +1,241 @@
+/* ReadingAdventure.css */
+
+/* Base Styles */
 .reading-adventure {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-  
-  .progress-bar {
-    height: 8px;
-    background-color: #eee;
-    border-radius: 4px;
-    margin-bottom: 24px;
-    overflow: hidden;
-  }
-  
-  .progress-fill {
-    height: 100%;
-    background-color: var(--primary-color);
-    transition: width 0.5s ease;
-  }
-  
+  font-family: 'Open Dyslexic', 'Comic Sans', Arial, sans-serif;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem;
+  color: #333;
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+  display: flex;
+  flex-direction: column;
+  min-height: 80vh;
+}
+
+/* Progress Bar */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e0e6ed;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #4a6fa5;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* Story Container */
+.story-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  flex: 1;
+}
+
+.story-image-container {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-height: 400px;
+}
+
+.story-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.story-image:hover {
+  transform: scale(1.02);
+}
+
+.story-text-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.story-text {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+/* Word Styling */
+.story-word {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  padding: 0 2px;
+}
+
+.story-word:hover {
+  background-color: #f0f4f8;
+  border-radius: 3px;
+}
+
+.story-word.highlighted {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+/* Word Help Section */
+.word-help {
+  min-height: 80px;
+}
+
+.word-definition {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.focused-word {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #3a5a78;
+  margin-bottom: 0.5rem;
+}
+
+.word-hint {
+  font-size: 1rem;
+  color: #64748b;
+}
+
+/* Reading Controls */
+.reading-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.read-aloud-button {
+  background-color: #4a6fa5;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.read-aloud-button:hover {
+  background-color: #3a5a78;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(74, 111, 165, 0.3);
+}
+
+/* Navigation Controls */
+.navigation-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding: 1rem 0;
+}
+
+.nav-button {
+  background-color: white;
+  border: 2px solid #e0e6ed;
+  color: #3a5a78;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-button:hover:not(.disabled) {
+  background-color: #f0f4f8;
+  border-color: #4a6fa5;
+  color: #4a6fa5;
+}
+
+.nav-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-indicator {
+  font-size: 1rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Accessibility Features */
+.story-word:focus,
+.read-aloud-button:focus,
+.nav-button:focus {
+  outline: 3px solid #4a6fa5;
+  outline-offset: 3px;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
   .story-container {
-    display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    margin-bottom: 32px;
-  }
-  
-  .story-image-container {
-    position: relative;
-    border-radius: 16px;
-    overflow: hidden;
-    aspect-ratio: 4/3;
-  }
-  
-  .story-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-  }
-  
-  .story-image:hover {
-    transform: scale(1.02);
-  }
-  
-  .story-text-container {
-    display: flex;
-    flex-direction: column;
   }
   
   .story-text {
-    background-color: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    font-size: 1.25rem;
-    line-height: 1.8;
-    margin-bottom: 24px;
-    flex: 1;
+    font-size: 1.3rem;
   }
-  
-  .story-word {
-    cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    display: inline-block;
-  }
-  
-  .story-word:hover {
-    background-color: rgba(74, 111, 165, 0.1);
-  }
-  
-  .story-word.highlighted {
-    background-color: rgba(74, 111, 165, 0.2);
-    font-weight: bold;
-    color: var(--primary-color);
-  }
-  
-  .word-help {
-    background-color: white;
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    margin-bottom: 24px;
-    min-height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .word-definition {
-    text-align: center;
+}
+
+@media (max-width: 480px) {
+  .story-text {
+    font-size: 1.1rem;
+    padding: 1rem;
   }
   
   .focused-word {
     font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--primary-color);
-    margin-bottom: 8px;
-  }
-  
-  .word-hint {
-    font-size: 0.9rem;
-    color: var(--text-color-light);
-  }
-  
-  .reading-controls {
-    display: flex;
-    justify-content: center;
   }
   
   .read-aloud-button {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 24px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .read-aloud-button:hover {
-    background-color: #3a5a84;
-  }
-  
-  .navigation-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: auto;
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
   }
   
   .nav-button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background-color: white;
-    border: 2px solid var(--primary-color);
-    color: var(--primary-color);
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
   }
   
-  .nav-button:hover:not(.disabled) {
-    background-color: var(--primary-color);
-    color: white;
+  .nav-button span {
+    display: none;
   }
-  
-  .nav-button.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    border-color: #ccc;
-    color: #999;
-  }
-  
-  .page-indicator {
-    font-weight: 500;
-    color: var(--text-color-light);
-  }
-  
-  @media (max-width: 1024px) {
-    .story-container {
-      grid-template-columns: 1fr;
-    }
-    
-    .story-image-container {
-      aspect-ratio: 16/9;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .story-text {
-      font-size: 1.1rem;
-      padding: 16px;
-    }
-    
-    .navigation-controls {
-      flex-direction: column;
-      gap: 16px;
-    }
-    
-    .nav-button {
-      width: 100%;
-      justify-content: center;
-    }
-    
-    .page-indicator {
-      order: -1;
-      margin-bottom: 8px;
-    }
-  }
+}
+
+/* Animation for Interactive Elements */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.word-definition {
+  animation: fadeIn 0.3s ease-out;
+}

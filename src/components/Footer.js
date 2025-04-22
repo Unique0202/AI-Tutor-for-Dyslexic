@@ -6,7 +6,7 @@ const Footer = () => {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-section">
-          <h3 className="footer-heading">DyslexiLearn</h3>
+          <h3 className="footer-heading">NeuroLearn</h3>
           <p className="footer-text">
             Empowering dyslexic students to learn in ways that work best for them.
           </p>
@@ -34,7 +34,7 @@ const Footer = () => {
       </div>
       
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} DyslexiLearn. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} NeuroLearn. All rights reserved.</p>
       </div>
     </footer>
   );

@@ -11,7 +11,7 @@ const HomePage = () => {
   useEffect(() => {
     // Automatically read welcome message when page loads
     if (settings.textToSpeechEnabled) {
-      const welcomeText = "Welcome to DyslexiLearn. Your learning journey starts here!";
+      const welcomeText = "Welcome to NeuroLearn. Your learning journey starts here!";
       speak(welcomeText);
     }
   }, []);
@@ -81,12 +81,12 @@ const HomePage = () => {
           <h1 className="hero-title">
             Learning Made for You
             <TextToSpeech 
-              text="Learning Made for You. Welcome to DyslexiLearn, where we make learning fun and accessible for students with dyslexia."
+              text="Learning Made for You. Welcome to NeuroLearn, where we make learning fun and accessible for students with dyslexia."
               className="hero-tts"
             />
           </h1>
           <p className="hero-text">
-            Welcome to DyslexiLearn, where we make learning fun and accessible for students with dyslexia.
+            Welcome to NeuroLearn, where we make learning fun and accessible for students with dyslexia.
           </p>
           <div className="hero-buttons">
             <Link to="/games" className="btn btn-primary">
@@ -151,7 +151,7 @@ const HomePage = () => {
         <div className="testimonial-card">
           <div className="testimonial-content">
             <p className="testimonial-text">
-              "The games on DyslexiLearn have helped me improve my reading so much! I used to struggle with words, but now I feel more confident."
+              "The games on NeuroLearn have helped me improve my reading so much! I used to struggle with words, but now I feel more confident."
             </p>
             <div className="testimonial-author">
               <p className="author-name">Jamie, Age 12</p>
