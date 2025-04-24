@@ -15,7 +15,7 @@ const GamesPage = () => {
       id: "reading-adventure",
       title: "Reading Adventure",
       description: "Journey through stories with interactive reading support. Words are highlighted as they're read aloud, and difficult words can be clicked for help.",
-      image: "https://images.pexels.com/photos/256502/pexels-photo-256502.jpeg",
+      image: "https://images.pexels.com/photos/3661193/pexels-photo-3661193.jpeg",
       category: "reading",
       difficulty: "all-levels",
       icon: "📚"
@@ -33,7 +33,7 @@ const GamesPage = () => {
       id: "word-builder",
       title: "Word Builder",
       description: "Construct words from letters with visual aids. Drag letters to build words, with audio support for letter sounds.",
-      image: "https://images.pexels.com/photos/276517/pexels-photo-276517.jpeg",
+      image: "https://images.pexels.com/photos/5912582/pexels-photo-5912582.jpeg",
       category: "spelling",
       difficulty: "intermediate",
       icon: "🧩"
@@ -42,7 +42,7 @@ const GamesPage = () => {
       id: "spell-quest",
       title: "Spell Quest",
       description: "Practice spelling words with audio guidance. Listen to words and spell them correctly to advance on your quest.",
-      image: "https://images.pexels.com/photos/7103/writing-notes-idea-conference.jpg",
+      image: "https://images.pexels.com/photos/1153929/pexels-photo-1153929.jpeg",
       category: "spelling",
       difficulty: "advanced",
       icon: "✨"

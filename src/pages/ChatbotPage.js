@@ -86,6 +86,9 @@ const ChatbotPage = () => {
     if (userText.includes('hello') || userText.includes('hi') || userText.includes('hey')) {
       return "Hello! How can I help you today with your learning?";
     }
+    else if (userText.includes('games') || userText.includes('play')) {
+      return "We have four main games: Reading Adventure helps with reading fluency, Letter Master helps with letter recognition, Word Builder helps with spelling and word formation, and Spell Quest helps with spelling skills. You can access them all from the Games page!";
+    }
     else if (userText.includes('what is dyslexia') || userText.includes('explain dyslexia')) {
       return "Dyslexia is a learning difference that affects how the brain processes written and sometimes spoken language. It can make reading, writing, and spelling challenging, but it has nothing to do with intelligence. People with dyslexia often have strengths in creativity, problem-solving, and big-picture thinking!";
     }
@@ -97,9 +100,6 @@ const ChatbotPage = () => {
     }
     else if (userText.includes('how to use') || userText.includes('website help')) {
       return "Our website has four main sections: Games, AI Helper (that's me!), Profile, and Settings. You can use the games to practice different skills, adjust accessibility settings like font size and spacing, and track your progress in your profile. Is there a specific part you need help with?";
-    }
-    else if (userText.includes('games') || userText.includes('play')) {
-      return "We have four main games: Reading Adventure helps with reading fluency, Letter Master helps with letter recognition, Word Builder helps with spelling and word formation, and Spell Quest helps with spelling skills. You can access them all from the Games page!";
     }
     else if (userText.includes('settings') || userText.includes('accessibility')) {
       return "To change settings, click on the gear icon in the top right corner of any page. You can enable dyslexia-friendly font, high contrast mode, larger text, extra spacing between letters, and adjust text-to-speech settings. These features can make reading easier!";

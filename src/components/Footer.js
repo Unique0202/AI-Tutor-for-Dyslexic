@@ -25,9 +25,9 @@ const Footer = () => {
         <div className="footer-section">
           <h3 className="footer-heading">Resources</h3>
           <ul className="footer-links">
-            <li><a href="#about">About Dyslexia</a></li>
-            <li><a href="#tips">Learning Tips</a></li>
-            <li><a href="#help">Help & Support</a></li>
+            {/* <li><a href="#about">About Dyslexia</a></li> */}
+            {/* <li><a href="#tips">Learning Tips</a></li> */}
+            {/* <li><a href="#help">Help & Support</a></li> */}
             <li><a href="#faq">FAQs</a></li>
           </ul>
         </div>

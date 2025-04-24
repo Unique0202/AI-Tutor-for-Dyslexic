@@ -23,7 +23,7 @@ const GameDetail = () => {
         title: "Reading Adventure",
         description: "Journey through stories with interactive reading support. Words are highlighted as they're read aloud, and difficult words can be clicked for help.",
         longDescription: "Reading Adventure is designed to make reading more accessible for students with dyslexia. The game presents stories with words that are highlighted as they're read aloud, helping to reinforce the connection between written words and their sounds. You can click on any difficult word to hear it pronounced clearly and see a visual representation of its meaning. Progress at your own pace and build reading confidence!",
-        image: "https://images.pexels.com/photos/256502/pexels-photo-256502.jpeg",
+        image: "https://images.pexels.com/photos/3661193/pexels-photo-3661193.jpeg",
         skills: ["Reading Comprehension", "Vocabulary", "Word Recognition", "Focus"],
         benefits: [
           "Improves reading fluency",
@@ -55,7 +55,7 @@ const GameDetail = () => {
         title: "Word Builder",
         description: "Construct words from letters with visual aids. Drag letters to build words, with audio support for letter sounds.",
         longDescription: "In Word Builder, you'll construct words from individual letters, with helpful visual aids to guide you. Drag and drop letters to form words based on pictures, audio cues, or definitions. As you place each letter, you'll hear its sound, reinforcing the connection between letters and sounds. The game adapts to your skill level, starting with simple three-letter words and progressing to more complex vocabulary.",
-        image: "https://images.pexels.com/photos/276517/pexels-photo-276517.jpeg",
+        image: "https://images.pexels.com/photos/5912582/pexels-photo-5912582.jpeg",
         skills: ["Spelling", "Word Formation", "Letter Sequencing", "Visual-Motor Skills"],
         benefits: [
           "Improves spelling skills",
@@ -71,7 +71,7 @@ const GameDetail = () => {
         title: "Spell Quest",
         description: "Practice spelling words with audio guidance. Listen to words and spell them correctly to advance on your quest.",
         longDescription: "Spell Quest takes you on an adventure where you'll practice spelling words with helpful audio guidance. Listen to words being pronounced clearly, then spell them correctly to advance on your quest. The game provides immediate feedback and extra support for challenging words. Multi-sensory cues help reinforce spelling patterns, and visual rewards keep motivation high as you master increasingly difficult words.",
-        image: "https://images.pexels.com/photos/7103/writing-notes-idea-conference.jpg",
+        image: "https://images.pexels.com/photos/1153929/pexels-photo-1153929.jpeg",
         skills: ["Spelling", "Auditory Processing", "Memory", "Phonological Awareness"],
         benefits: [
           "Strengthens spelling abilities",
