@@ -11,6 +11,9 @@
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
+    transform: translate(5px, 5px); 
+    margin-left: 5px; 
+    margin-top: 5px; 
   }
   
   .text-to-speech-button:hover {

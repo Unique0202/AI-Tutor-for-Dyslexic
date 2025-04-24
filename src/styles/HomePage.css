@@ -413,3 +413,56 @@
     font-size: 1.2rem;
   }
 }
+
+
+.hero-title-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.hero-tts {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 1rem;
+}
+
+/* Adjust the hero-title to account for the TTS button */
+.hero-title {
+  font-size: 3.2rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  color: var(--text-lighter);
+  line-height: 1.2;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-right: 50px; /* Add space for the TTS button */
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* For mobile responsiveness */
+@media (max-width: 768px) {
+  .hero-title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .hero-tts {
+    position: static;
+    transform: none;
+    margin: 0.5rem 0 1rem 0;
+    align-self: flex-start;
+  }
+  
+  .hero-title {
+    padding-right: 0;
+  }
+}
+
