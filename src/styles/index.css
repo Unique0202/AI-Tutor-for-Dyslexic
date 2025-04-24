@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import OpenDyslexic font */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+:root {
+  --primary-color: #4a6fa5;
+  --secondary-color: #9dc6e2;
+  --accent-color: #ffd166;
+  --success-color: #06d6a0;
+  --warning-color: #ffd166;
+  --error-color: #ef476f;
+  --background-color: #f8f9fa;
+  --text-color: #333;
+  --text-color-light: #5a5a5a;
+  --font-family: 'OpenDyslexic', Arial, sans-serif;
+  --line-height-text: 1.8;
+  --line-height-heading: 1.5;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    line-height: var(--line-height-text);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    line-height: var(--line-height-heading);
+    margin-bottom: 0.5em;
+    font-weight: bold;
+    letter-spacing: 0.02em;
+  }
+
+  p {
+    margin-bottom: 1.5em;
+  }
+}
+
+@layer components {
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 16px;
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .btn {
+    @apply py-2 px-4 rounded-lg font-bold transition-all duration-300;
+    background-color: var(--primary-color);
+    color: white;
+  }
+
+  .btn:hover {
+    filter: brightness(110%);
+    transform: translateY(-2px);
+  }
+
+  .btn:active {
+    transform: translateY(0);
+  }
+
+  .card {
+    @apply p-6 rounded-xl shadow-md bg-white;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(74, 111, 165, 0.2);
+  }
+}
+
+/* Accessibility styles */
+.dyslexic-font {
+  font-family: var(--font-family) !important;
+}
+
+.high-contrast {
+  --background-color: #000;
+  --text-color: #fff;
+  --text-color-light: #ddd;
+}
+
+.large-text {
+  font-size: 120% !important;
+}
+
+.extra-spacing {
+  letter-spacing: 0.1em !important;
+  word-spacing: 0.2em !important;
+}

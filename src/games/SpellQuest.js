@@ -159,13 +159,13 @@ const SpellQuest = () => {
               message: "Congratulations! You've completed all levels!"
             });
             speak("Congratulations! You've completed all levels!");
-          }, 2000);
+          }, 3000);
         }
       } else {
         // Move to next question
         setTimeout(() => {
           setCurrentQuestion(prev => prev + 1);
-        }, 2000);
+        }, 3000);
       }
     } else {
       // Incorrect

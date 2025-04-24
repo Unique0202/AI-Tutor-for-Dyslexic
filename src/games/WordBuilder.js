@@ -162,7 +162,7 @@ const WordBuilder = () => {
             setCurrentQuestion(0);
             setUsedWords([]);
             speak(`Moving to level ${level + 1}!`);
-          }, 2000);
+          }, 5000);
         } else {
           setTimeout(() => {
             setFeedback({
@@ -170,13 +170,13 @@ const WordBuilder = () => {
               message: "Congratulations! You've completed all levels!"
             });
             speak("Congratulations! You've completed all levels!");
-          }, 2000);
+          }, 5000);
         }
       } else {
         // Move to next question
         setTimeout(() => {
           setCurrentQuestion(prev => prev + 1);
-        }, 2000);
+        }, 5000);
       }
     } else {
       // Incorrect
