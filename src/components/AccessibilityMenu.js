@@ -1,7 +1,22 @@
 import React from 'react';
 import { useAccessibility } from '../contexts/AccessibilityContext';
-import { X, Type, Sun, CircleOff, LetterSpacing } from 'lucide-react';
+import { X, Type, Sun, CircleOff} from 'lucide-react';
 import '../styles/AccessibilityMenu.css';
+
+const LetterSpacing = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 5V19M9 8L6 5L3 8M9 16L6 19L3 16M21 8L18 5L15 8M21 16L18 19L15 16" />
+  </svg>
+);
 
 const AccessibilityMenu = ({ onClose }) => {
   const { settings, updateSettings } = useAccessibility();
