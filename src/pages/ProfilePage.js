@@ -58,8 +58,8 @@ const ProfilePage = () => {
         </div>
         <div className="profile-info">
           <h1 className="profile-name">
-            Student Profile
-            <TextToSpeech text="Student Profile" />
+            Mayank's Profile
+            <TextToSpeech text="Mayank's Profile" />
           </h1>
           <p className="profile-stats">
             <span className="streak">

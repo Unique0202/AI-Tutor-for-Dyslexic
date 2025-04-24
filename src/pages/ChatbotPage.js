@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, User, Bot, Mic, Volume2, RefreshCw } from 'lucide-react';
+import { Send, Mic, RefreshCw } from 'lucide-react';
 import { useAccessibility } from '../contexts/AccessibilityContext';
 import TextToSpeech from '../components/TextToSpeech';
 import '../styles/ChatbotPage.css';
+import UserIcon from '../assets/user-icon.png'; // Import your user icon image
+import BotIcon from '../assets/bot-icon.png'; // Import your bot icon image
 
 const ChatbotPage = () => {
   const [messages, setMessages] = useState([
@@ -17,18 +19,18 @@ const ChatbotPage = () => {
   const messagesEndRef = useRef(null);
   const [isListening, setIsListening] = useState(false);
   const { speak, settings } = useAccessibility();
-  
-    // Scroll to top on initial render
-    useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+
+  // Scroll to top on initial render
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // Auto scroll to bottom when new messages arrive
   useEffect(() => {
     if (messages.length > 1 && !isThinking) {
       scrollToBottom();
     }
   }, [messages, isThinking]);
-  
+
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({
@@ -37,26 +39,26 @@ const ChatbotPage = () => {
       });
     }
   };
-  
+
   const handleInputChange = (e) => {
     setInput(e.target.value);
   };
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!input.trim()) return;
-    
+
     // Add user message
     const userMessage = {
       role: 'user',
       content: input,
       time: new Date()
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsThinking(true);
-    
+
     // Simulate bot thinking
     setTimeout(() => {
       const botResponse = generateBotResponse(input.trim());
@@ -66,23 +68,23 @@ const ChatbotPage = () => {
         time: new Date()
       }]);
       setIsThinking(false);
-      
+
       // Read bot's response if text-to-speech is enabled
       if (settings.textToSpeechEnabled) {
         speak(botResponse);
       }
-      
+
       // Only scroll after bot responds, not after user submits
       setTimeout(() => {
         scrollToBottom();
       }, 100);
     }, 1500);
   };
-  
+
   const generateBotResponse = (userInput) => {
     // Simple keyword-based responses
     const userText = userInput.toLowerCase();
-    
+
     if (userText.includes('hello') || userText.includes('hi') || userText.includes('hey')) {
       return "Hello! How can I help you today with your learning?";
     }
@@ -114,41 +116,41 @@ const ChatbotPage = () => {
       return "That's a great question! While I'm a simple assistant, I'd recommend trying our Reading Adventure or Word Builder games to practice reading and spelling skills. These games are designed specifically for students with dyslexia. Is there something specific about the website you'd like to know?";
     }
   };
-  
+
   const startSpeechRecognition = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       alert('Speech recognition is not supported in your browser. Try using Chrome or Edge.');
       return;
     }
-    
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    
+
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.lang = 'en-US';
-    
+
     recognition.onstart = () => {
       setIsListening(true);
     };
-    
+
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setInput(transcript);
     };
-    
+
     recognition.onerror = (event) => {
       console.error('Speech recognition error', event);
       setIsListening(false);
     };
-    
+
     recognition.onend = () => {
       setIsListening(false);
     };
-    
+
     recognition.start();
   };
-  
+
   const resetChat = () => {
     setMessages([
       {
@@ -158,11 +160,11 @@ const ChatbotPage = () => {
       }
     ]);
   };
-  
+
   const formatTime = (date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
-  
+
   return (
     <div className="chatbot-page">
       <div className="chatbot-header">
@@ -180,19 +182,23 @@ const ChatbotPage = () => {
           <span>Reset Chat</span>
         </button>
       </div>
-      
+
       <div className="chat-container">
-        <div className="messages-container" style={{ 
+        <div className="messages-container" style={{
           justifyContent: messages.length <= 1 ? 'flex-end' : 'flex-start' ,
           overflowAnchor: 'none' // Add this to prevent auto-scrolling
         }}>
           {messages.map((message, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className={`message ${message.role === 'user' ? 'user-message' : 'bot-message'}`}
             >
               <div className="message-avatar">
-                {message.role === 'user' ? <User size={20} /> : <Bot size={20} />}
+                {message.role === 'user' ? (
+                  <img src={UserIcon} alt="User Icon" className="profile-icon" />
+                ) : (
+                  <img src={BotIcon} alt="Bot Icon" className="profile-icon" />
+                )}
               </div>
               <div className="message-content">
                 <div className="message-text">{message.content}</div>
@@ -205,11 +211,11 @@ const ChatbotPage = () => {
               </div>
             </div>
           ))}
-          
+
           {isThinking && (
             <div className="message bot-message">
               <div className="message-avatar">
-                <Bot size={20} />
+                <img src={BotIcon} alt="Bot Icon" className="profile-icon" />
               </div>
               <div className="message-content">
                 <div className="thinking-indicator">
@@ -220,19 +226,19 @@ const ChatbotPage = () => {
               </div>
             </div>
           )}
-          
+
           <div ref={messagesEndRef} />
         </div>
-        
+
         <form className="chat-input" onSubmit={handleSubmit}>
-          <button 
-            type="button" 
+          <button
+            type="button"
             className={`voice-input-button ${isListening ? 'listening' : ''}`}
             onClick={startSpeechRecognition}
           >
             <Mic size={20} />
           </button>
-          
+
           <input
             type="text"
             value={input}
@@ -240,35 +246,35 @@ const ChatbotPage = () => {
             placeholder="Type your question here..."
             disabled={isThinking}
           />
-          
+
           <button type="submit" className="send-button" disabled={!input.trim() || isThinking}>
             <Send size={20} />
           </button>
         </form>
       </div>
-      
+
       <div className="chatbot-suggestions">
         <h3>Suggested Questions</h3>
         <div className="suggestion-buttons">
-          <button 
+          <button
             className="suggestion-button"
             onClick={() => setInput("What is dyslexia?")}
           >
             What is dyslexia?
           </button>
-          <button 
+          <button
             className="suggestion-button"
             onClick={() => setInput("Give me some reading tips")}
           >
             Give me some reading tips
           </button>
-          <button 
+          <button
             className="suggestion-button"
             onClick={() => setInput("How can I improve my spelling?")}
           >
             How can I improve my spelling?
           </button>
-          <button 
+          <button
             className="suggestion-button"
             onClick={() => setInput("Tell me about the games")}
           >

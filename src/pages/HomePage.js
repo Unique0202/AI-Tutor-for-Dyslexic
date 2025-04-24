@@ -1,13 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, MessageSquare, Settings, Award } from 'lucide-react';
 import TextToSpeech from '../components/TextToSpeech';
 import { useAccessibility } from '../contexts/AccessibilityContext';
 import '../styles/HomePage.css';
+import LeftButtonIcon from '../assets/leftButtonIcon.png'; // Import your left button icon
+import RightButtonIcon from '../assets/rightButtonIcon.png'; // Import your right button icon
 
 const HomePage = () => {
   const { speak, settings } = useAccessibility();
-  
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
   useEffect(() => {
     // Automatically read welcome message when page loads
     if (settings.textToSpeechEnabled) {
@@ -74,6 +77,58 @@ const HomePage = () => {
     }
   ];
 
+  const testimonials = [
+    {
+      id: 1,
+      text: "The games on NeuroLearn have helped me improve my reading so much! I used to struggle with words, but now I feel more confident.",
+      author: "Mudit, Age 12",
+      role: "Student"
+    },
+    {
+      id: 2,
+      text: "As a parent, I've seen remarkable progress in my child's reading abilities since using NeuroLearn. The games make learning fun and engaging.",
+      author: "Sarah Johnson",
+      role: "Parent"
+    },
+    {
+      id: 3,
+      text: "I recommend NeuroLearn to all my students with dyslexia. The multisensory approach really helps them grasp concepts they've struggled with before.",
+      author: "Mr. Thompson",
+      role: "Special Education Teacher"
+    },
+    {
+      id: 4,
+      text: "The AI helper has been a game-changer for my learning. I can get instant explanations when I'm stuck on a word or concept.",
+      author: "Alex, Age 14",
+      role: "Student"
+    },
+    {
+      id: 5,
+      text: "NeuroLearn's progress tracking helps me see exactly where my child needs more support. It's been invaluable for our homeschooling journey.",
+      author: "Dr. Patel",
+      role: "Parent & Educator"
+    },
+    {
+      id: 6,
+      text: "I used to hate reading because it was so hard. Now I look forward to my NeuroLearn time every day!",
+      author: "Emma, Age 10",
+      role: "Student"
+    }
+  ];
+
+  const nextTestimonial = () => {
+    setCurrentTestimonial((prev) =>
+      prev === testimonials.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevTestimonial = () => {
+    setCurrentTestimonial((prev) =>
+      prev === 0 ? testimonials.length - 1 : prev - 1
+    );
+  };
+
+
   return (
     <div className="home-page">
       <section className="hero-section">
@@ -82,7 +137,7 @@ const HomePage = () => {
   <h1 className="hero-title">
     Learning Made for You
   </h1>
-  <TextToSpeech 
+  <TextToSpeech
     text="Learning Made for You. Welcome to NeuroLearn, where we make learning fun and accessible for students with dyslexia."
     className="hero-tts"
   />
@@ -100,10 +155,10 @@ const HomePage = () => {
           </div>
         </div>
         <div className="hero-image">
-          <img 
-            src="https://images.pexels.com/photos/4145355/pexels-photo-4145355.jpeg" 
+          <img
+            src="https://images.pexels.com/photos/4145355/pexels-photo-4145355.jpeg"
             alt="Student enjoying learning"
-            className="rounded-image" 
+            className="rounded-image"
           />
         </div>
       </section>
@@ -150,15 +205,44 @@ const HomePage = () => {
           Student Success Stories
           <TextToSpeech text="Student Success Stories" />
         </h2>
-        <div className="testimonial-card">
-          <div className="testimonial-content">
-            <p className="testimonial-text">
-              "The games on NeuroLearn have helped me improve my reading so much! I used to struggle with words, but now I feel more confident."
-            </p>
-            <div className="testimonial-author">
-              <p className="author-name">Mudit, Age 12</p>
+        <div className="testimonial-container">
+          <button
+            className="testimonial-nav-btn prev-btn"
+            onClick={prevTestimonial}
+            aria-label="Previous testimonial"
+          >
+            <img src={LeftButtonIcon} alt="Previous" className="testimonial-icon" />
+          </button>
+
+          <div className="testimonial-card">
+            <div className="testimonial-content">
+              <p className="testimonial-text">
+                "{testimonials[currentTestimonial].text}"
+              </p>
+              <div className="testimonial-author">
+                <p className="author-name">{testimonials[currentTestimonial].author}</p>
+                <p className="author-role">{testimonials[currentTestimonial].role}</p>
+              </div>
             </div>
           </div>
+
+          <button
+            className="testimonial-nav-btn next-btn"
+            onClick={nextTestimonial}
+            aria-label="Next testimonial"
+          >
+            <img src={RightButtonIcon} alt="Next" className="testimonial-icon" />
+          </button>
+        </div>
+        <div className="testimonial-dots">
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              className={`dot ${index === currentTestimonial ? 'active' : ''}`}
+              onClick={() => setCurrentTestimonial(index)}
+              aria-label={`Go to testimonial ${index + 1}`}
+            />
+          ))}
         </div>
       </section>
 
