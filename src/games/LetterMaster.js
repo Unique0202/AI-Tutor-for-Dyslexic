@@ -6,8 +6,8 @@ const getLetterSound = (letter) => {
   const letterSounds = {
     'A': 'ay as in apple',
     'B': 'buh',
-    'C': 'kuh or sss',
-    'D': 'duh',
+    'C': 'si',
+    'D': 'di',
     'E': 'eh',
     'F': 'fff',
     'G': 'guh',
