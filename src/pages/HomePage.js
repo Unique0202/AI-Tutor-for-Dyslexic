@@ -78,13 +78,15 @@ const HomePage = () => {
     <div className="home-page">
       <section className="hero-section">
         <div className="hero-content">
-          <h1 className="hero-title">
-            Learning Made for You
-            <TextToSpeech 
-              text="Learning Made for You. Welcome to NeuroLearn, where we make learning fun and accessible for students with dyslexia."
-              className="hero-tts"
-            />
-          </h1>
+        <div className="hero-title-container">
+  <h1 className="hero-title">
+    Learning Made for You
+  </h1>
+  <TextToSpeech 
+    text="Learning Made for You. Welcome to NeuroLearn, where we make learning fun and accessible for students with dyslexia."
+    className="hero-tts"
+  />
+</div>
           <p className="hero-text">
             Welcome to NeuroLearn, where we make learning fun and accessible for students with dyslexia.
           </p>
@@ -154,7 +156,7 @@ const HomePage = () => {
               "The games on NeuroLearn have helped me improve my reading so much! I used to struggle with words, but now I feel more confident."
             </p>
             <div className="testimonial-author">
-              <p className="author-name">Jamie, Age 12</p>
+              <p className="author-name">Mudit, Age 12</p>
             </div>
           </div>
         </div>
