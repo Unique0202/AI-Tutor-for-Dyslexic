@@ -1,298 +1,310 @@
 /* SpellQuest.css */
 
-/* Base Styles */
 .spell-quest {
-  font-family: 'Open Dyslexic', 'Comic Sans', Arial, sans-serif;
-  max-width: 800px;
-  margin: 0 auto;
+  --primary-color: #6c5ce7;
+  --secondary-color: #00cec9;
+  --accent-color: #fd79a8;
+  --dark-bg: #1a1a2e;
+  --darker-bg: #16213e;
+  --card-bg: #0f3460;
+  --text-light: #f0f0f0;
+  --text-lighter: #ffffff;
+  --text-muted: #c9c9c9;
+  --transition-speed: 0.3s;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--dark-bg);
+  color: var(--text-light);
+  min-height: 100vh;
+  line-height: 1.7;
   padding: 2rem;
-  color: #333;
-  letter-spacing: 0.05em;
-  word-spacing: 0.1em;
-  display: flex;
-  flex-direction: column;
-  min-height: 80vh;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* Game Info Bar */
+/* Level Buttons */
+.level-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.level-button {
+  padding: 0.7rem 1.5rem;
+  border-radius: 50px;
+  background-color: var(--card-bg);
+  color: var(--text-light);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+}
+
+.level-button:hover {
+  background-color: rgba(108, 92, 231, 0.3);
+}
+
+.level-button.active {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+/* Game Info */
 .game-info {
   display: flex;
   justify-content: space-between;
-  background-color: white;
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
   margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: var(--darker-bg);
+  border-radius: 8px;
   font-weight: 600;
 }
 
-.level-display {
-  color: #4a6fa5;
+.game-info div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .score-display {
-  color: #06d6a0;
+  color: var(--secondary-color);
 }
 
 .hints-display {
-  color: #ef476f;
+  color: var(--accent-color);
 }
 
-/* Spell Challenge Area */
+/* Spell Challenge */
 .spell-challenge {
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background-color: var(--card-bg);
   padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 2rem;
 }
 
 .challenge-header {
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .challenge-header h2 {
   font-size: 1.8rem;
-  color: #3a5a78;
   margin-bottom: 0.5rem;
+  color: var(--text-lighter);
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .word-definition {
   font-size: 1.2rem;
-  color: #64748b;
-  max-width: 600px;
-  line-height: 1.6;
+  color: var(--text-light);
+  font-style: italic;
 }
 
 /* Audio Player */
 .audio-player {
-  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
 }
 
 .audio-button {
-  background-color: #e0f2fe;
-  color: #0369a1;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background-color: var(--darker-bg);
+  color: var(--text-light);
+  border: 2px solid var(--primary-color);
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
 }
 
 .audio-button:hover {
-  background-color: #bae6fd;
-  transform: translateY(-2px);
+  background-color: rgba(108, 92, 231, 0.2);
 }
 
 /* Spelling Input */
 .spelling-input {
-  width: 100%;
-  max-width: 500px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .word-input {
-  width: 100%;
   padding: 1rem;
-  border: 2px solid #e0e6ed;
+  font-size: 1.2rem;
   border-radius: 8px;
-  font-size: 1.5rem;
-  font-family: inherit;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--darker-bg);
+  color: var(--text-light);
   text-align: center;
-  transition: all 0.3s ease;
+  transition: all var(--transition-speed) ease;
 }
 
 .word-input:focus {
   outline: none;
-  border-color: #4a6fa5;
-  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.3);
 }
 
 .input-actions {
   display: flex;
-  justify-content: center;
   gap: 1rem;
-  margin-top: 1rem;
+  justify-content: center;
 }
 
 .hint-button {
-  background-color: #fef3c7;
-  color: #92400e;
-  border: none;
   padding: 0.8rem 1.5rem;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
   border-radius: 8px;
-  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-speed) ease;
 }
 
 .hint-button:hover:not(:disabled) {
-  background-color: #fde68a;
+  background-color: #e6689a;
   transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .hint-button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .check-button {
-  background-color: #4a6fa5;
-  color: white;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
 }
 
 .check-button:hover:not(:disabled) {
-  background-color: #3a5a78;
+  background-color: #5649d2;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(74, 111, 165, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .check-button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 /* Hint Display */
 .hint-display {
-  background-color: #f0f4f8;
   padding: 1rem;
+  background-color: var(--darker-bg);
   border-radius: 8px;
-  width: 100%;
-  max-width: 500px;
-  text-align: center;
-  font-size: 1rem;
-  color: #475569;
-  margin-top: 1rem;
+  border-left: 4px solid var(--accent-color);
+  margin-bottom: 1.5rem;
+}
+
+.hint-display p {
+  margin: 0;
+  color: var(--text-light);
 }
 
 .hint-display strong {
-  color: #3a5a78;
+  color: var(--accent-color);
 }
 
-/* Feedback Messages */
+/* Feedback */
 .feedback {
-  padding: 1rem 1.5rem;
+  padding: 1.5rem;
   border-radius: 8px;
-  font-size: 1.1rem;
+  font-weight: 600;
   text-align: center;
-  width: 100%;
-  max-width: 500px;
-  margin-top: 1rem;
-  animation: fadeIn 0.3s ease-out;
+  margin-bottom: 1.5rem;
+  transition: all var(--transition-speed) ease;
 }
 
 .feedback.success {
-  background-color: #ecfdf5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
+  background-color: rgba(0, 206, 201, 0.2);
+  border-left: 4px solid var(--secondary-color);
+  color: var(--secondary-color);
 }
 
 .feedback.error {
-  background-color: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
+  background-color: rgba(253, 121, 168, 0.2);
+  border-left: 4px solid var(--accent-color);
+  color: var(--accent-color);
 }
 
 .feedback.warning {
-  background-color: #fffbeb;
-  color: #92400e;
-  border: 1px solid #fcd34d;
+  background-color: rgba(255, 193, 7, 0.2);
+  border-left: 4px solid #ffc107;
+  color: #ffc107;
 }
 
 .feedback.info {
-  background-color: #eff6ff;
-  color: #1e40af;
-  border: 1px solid #93c5fd;
+  background-color: rgba(108, 92, 231, 0.2);
+  border-left: 4px solid var(--primary-color);
+  color: var(--primary-color);
 }
 
 /* Attempts Counter */
 .attempts-counter {
-  font-size: 1rem;
-  color: #64748b;
+  text-align: center;
   font-weight: 600;
-  margin-top: 1rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
 }
 
 /* Next Word Button */
 .next-word-button {
-  background-color: white;
-  border: 2px solid #e0e6ed;
-  color: #3a5a78;
-  padding: 0.8rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 2rem;
+  margin: 0 auto;
+  padding: 0.7rem 1.2rem;
+  background-color: transparent;
+  color: var(--text-muted);
+  border: 2px solid var(--text-muted);
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
 }
 
 .next-word-button:hover {
-  background-color: #f0f4f8;
-  border-color: #4a6fa5;
-  color: #4a6fa5;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Accessibility Features */
-.word-input:focus,
-.audio-button:focus,
-.hint-button:focus,
-.check-button:focus,
-.next-word-button:focus {
-  outline: 3px solid #4a6fa5;
-  outline-offset: 3px;
+  color: var(--text-light);
+  border-color: var(--text-light);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .spell-quest {
-    padding: 1rem;
+    padding: 1.5rem;
   }
   
   .game-info {
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
     align-items: center;
-  }
-  
-  .word-input {
-    font-size: 1.3rem;
   }
   
   .input-actions {
     flex-direction: column;
-    align-items: center;
   }
   
   .hint-button,
@@ -300,9 +312,7 @@
     width: 100%;
     justify-content: center;
   }
-}
-
-@media (max-width: 480px) {
+  
   .challenge-header h2 {
     font-size: 1.5rem;
   }
@@ -310,12 +320,13 @@
   .word-definition {
     font-size: 1rem;
   }
-  
-  .audio-button span {
-    display: none;
-  }
-  
-  .next-word-button span {
-    display: none;
+}
+
+@media (prefers-reduced-motion) {
+  .audio-button:hover,
+  .hint-button:hover,
+  .check-button:hover,
+  .next-word-button:hover {
+    transform: none !important;
   }
 }

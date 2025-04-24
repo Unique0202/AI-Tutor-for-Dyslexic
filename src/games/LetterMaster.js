@@ -2,180 +2,365 @@ import React, { useState, useEffect } from 'react';
 import { useAccessibility } from '../contexts/AccessibilityContext';
 import '../styles/LetterMaster.css';
 
+const getLetterSound = (letter) => {
+  const letterSounds = {
+    'A': 'ay as in apple',
+    'B': 'buh',
+    'C': 'kuh or sss',
+    'D': 'duh',
+    'E': 'eh',
+    'F': 'fff',
+    'G': 'guh',
+    'H': 'huh',
+    'I': 'ih',
+    'J': 'juh',
+    'K': 'kuh',
+    'L': 'lll',
+    'M': 'mmm',
+    'N': 'nnn',
+    'O': 'oh',
+    'P': 'puh',
+    'Q': 'kwuh',
+    'R': 'rrr',
+    'S': 'sss',
+    'T': 'tuh',
+    'U': 'uh',
+    'V': 'vvv',
+    'W': 'wuh',
+    'X': 'ks',
+    'Y': 'yuh',
+    'Z': 'zzz'
+  };
+  return letterSounds[letter.toUpperCase()] || `the sound for ${letter}`;
+};
+
 const LetterMaster = () => {
-  const [currentLetter, setCurrentLetter] = useState(null);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
   const [options, setOptions] = useState([]);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [gameOver, setGameOver] = useState(false);
   const [level, setLevel] = useState(1);
   const [feedback, setFeedback] = useState(null);
+  const [usedWords, setUsedWords] = useState([]);
+  const [questionType, setQuestionType] = useState('letter');
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [questionsPerLevel, setQuestionsPerLevel] = useState(5);
   const { speak } = useAccessibility();
   
-  const letters = {
+  const wordBank = {
     1: [
-      { letter: 'A', image: 'https://images.pexels.com/photos/5946083/pexels-photo-5946083.jpeg', word: 'Apple' },
-      { letter: 'B', image: 'https://images.pexels.com/photos/1132047/pexels-photo-1132047.jpeg', word: 'Ball' },
+      { letter: 'A', image: 'https://images.pexels.com/photos/102104/pexels-photo-102104.jpeg', word: 'Apple' },
+      { letter: 'B', image: 'https://images.pexels.com/photos/47730/the-ball-stadion-football-the-pitch-47730.jpeg', word: 'Ball' },
       { letter: 'C', image: 'https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg', word: 'Cat' },
-      { letter: 'D', image: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg', word: 'Dog' },
-      { letter: 'E', image: 'https://images.pexels.com/photos/4218883/pexels-photo-4218883.jpeg', word: 'Elephant' },
-      { letter: 'F', image: 'https://images.pexels.com/photos/1418855/pexels-photo-1418855.jpeg', word: 'Fish' }
+      { letter: 'D', image: 'https://images.pexels.com/photos/2253275/pexels-photo-2253275.jpeg', word: 'Dog' },
+      { letter: 'E', image: 'https://images.pexels.com/photos/1054666/pexels-photo-1054666.jpeg', word: 'Elephant' },
+      { letter: 'F', image: 'https://images.pexels.com/photos/128756/pexels-photo-128756.jpeg', word: 'Fish' },
+      { letter: 'G', image: 'https://images.pexels.com/photos/67552/giraffe-tall-mammal-africa-67552.jpeg', word: 'Giraffe' },
+      { letter: 'H', image: 'https://images.pexels.com/photos/984619/pexels-photo-984619.jpeg', word: 'Hat' },
+      { letter: 'I', image: 'https://images.pexels.com/photos/1625235/pexels-photo-1625235.jpeg', word: 'Ice cream' },
+      { letter: 'J', image: 'https://images.pexels.com/photos/158053/fresh-orange-juice-squeezed-refreshing-citrus-158053.jpeg', word: 'Juice' }
     ],
     2: [
-      { letter: 'G', image: 'https://images.pexels.com/photos/1327405/pexels-photo-1327405.jpeg', word: 'Giraffe' },
-      { letter: 'H', image: 'https://images.pexels.com/photos/4939638/pexels-photo-4939638.jpeg', word: 'Hat' },
-      { letter: 'I', image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg', word: 'Ice cream' },
-      { letter: 'J', image: 'https://images.pexels.com/photos/4710644/pexels-photo-4710644.jpeg', word: 'Juice' },
-      { letter: 'K', image: 'https://images.pexels.com/photos/127027/pexels-photo-127027.jpeg', word: 'Kite' },
-      { letter: 'L', image: 'https://images.pexels.com/photos/134074/pexels-photo-134074.jpeg', word: 'Lion' }
+      { letter: 'K', image: 'https://images.pexels.com/photos/2225914/pexels-photo-2225914.jpeg', word: 'Kite' },
+      { letter: 'L', image: 'https://images.pexels.com/photos/33045/lion-wild-africa-african.jpg', word: 'Lion' },
+      { letter: 'M', image: 'https://images.pexels.com/photos/1670413/pexels-photo-1670413.jpeg', word: 'Monkey' },
+      { letter: 'N', image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg', word: 'Nut' },
+      { letter: 'O', image: 'https://images.pexels.com/photos/161559/background-bitter-breakfast-bright-161559.jpeg', word: 'Orange' },
+      { letter: 'P', image: 'https://images.pexels.com/photos/109255/pexels-photo-109255.jpeg', word: 'Pencil' },
+      { letter: 'Q', image: 'https://images.pexels.com/photos/260024/pexels-photo-260024.jpeg', word: 'Queen' },
+      { letter: 'R', image: 'https://images.pexels.com/photos/326012/pexels-photo-326012.jpeg', word: 'Rabbit' },
+      { letter: 'S', image: 'https://images.pexels.com/photos/301599/pexels-photo-301599.jpeg', word: 'Sun' },
+      { letter: 'T', image: 'https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg', word: 'Tree' }
     ],
     3: [
-      { letter: 'M', image: 'https://images.pexels.com/photos/918288/pexels-photo-918288.jpeg', word: 'Monkey' },
-      { letter: 'N', image: 'https://images.pexels.com/photos/73822/walnut-nut-shell-nutrition-food-73822.jpeg', word: 'Nut' },
-      { letter: 'O', image: 'https://images.pexels.com/photos/7195133/pexels-photo-7195133.jpeg', word: 'Orange' },
-      { letter: 'P', image: 'https://images.pexels.com/photos/5945559/pexels-photo-5945559.jpeg', word: 'Pencil' },
-      { letter: 'Q', image: 'https://images.pexels.com/photos/67508/pexels-photo-67508.jpeg', word: 'Queen' },
-      { letter: 'R', image: 'https://images.pexels.com/photos/3124079/pexels-photo-3124079.jpeg', word: 'Rabbit' }
+      { letter: 'U', image: 'https://images.pexels.com/photos/347735/pexels-photo-347735.jpeg', word: 'Umbrella' },
+      { letter: 'V', image: 'https://images.pexels.com/photos/34221/violin-musical-instrument-music-sound.jpg', word: 'Violin' },
+      { letter: 'W', image: 'https://images.pexels.com/photos/1313267/pexels-photo-1313267.jpeg', word: 'Watermelon' },
+      { letter: 'X', image: 'https://images.pexels.com/photos/165972/pexels-photo-165972.jpeg', word: 'Xylophone' },
+      { letter: 'Y', image: 'https://images.pexels.com/photos/51952/cow-bull-horns-coat-51952.jpeg', word: 'Yak' },
+      { letter: 'Z', image: 'https://images.pexels.com/photos/750539/pexels-photo-750539.jpeg', word: 'Zebra' },
+      { letter: 'A', image: 'https://images.pexels.com/photos/46148/aircraft-jet-landing-cloud-46148.jpeg', word: 'Airplane' },
+      { letter: 'B', image: 'https://images.pexels.com/photos/2280926/pexels-photo-2280926.jpeg', word: 'Banana' },
+      { letter: 'C', image: 'https://images.pexels.com/photos/51383/photo-camera-subject-photographer-51383.jpeg', word: 'Camera' },
+      { letter: 'D', image: 'https://images.pexels.com/photos/64219/dolphin-marine-mammals-water-sea-64219.jpeg', word: 'Dolphin' }
     ]
   };
   
+  // Question types with weights (more weight = more frequent)
+  const questionTypes = [
+    { type: 'letter', weight: 3, description: 'Identify the starting letter' },
+    { type: 'sound', weight: 2, description: 'Identify the letter that makes this sound' },
+    { type: 'word', weight: 2, description: 'Which word starts with this letter?' },
+    { type: 'uppercase', weight: 1, description: 'Match uppercase to lowercase' },
+    { type: 'missing', weight: 1, description: 'Fill in the missing letter' }
+  ];
+
   useEffect(() => {
+    // Reset when level changes
+    setCurrentQuestionIndex(0);
+    setUsedWords([]);
     startRound();
   }, [level]);
-  
-  const startRound = () => {
-    // Get current level letters
-    const currentLevelLetters = letters[level] || letters[1];
+
+  useEffect(() => {
+    // Start a new round when current question changes
+    if (currentQuestionIndex < questionsPerLevel) {
+      startRound();
+    }
+  }, [currentQuestionIndex]);
+
+  const getRandomQuestionType = () => {
+    const totalWeight = questionTypes.reduce((sum, type) => sum + type.weight, 0);
+    let random = Math.random() * totalWeight;
     
-    // Select a random letter as the target
-    const randomIndex = Math.floor(Math.random() * currentLevelLetters.length);
-    const target = currentLevelLetters[randomIndex];
-    setCurrentLetter(target);
-    
-    // Create options (different for each level)
-    let roundOptions = [];
-    
-    if (level === 1) {
-      // Level 1: Choose the correct letter from 3 options
-      roundOptions = getRandomLetters(3, target.letter);
-    } else if (level === 2) {
-      // Level 2: Choose the correct letter from 4 options
-      roundOptions = getRandomLetters(4, target.letter);
-    } else {
-      // Level 3: Choose the correct letter from 5 options with similar-looking letters
-      roundOptions = getRandomLetters(5, target.letter, true);
+    for (const type of questionTypes) {
+      if (random < type.weight) {
+        return type.type;
+      }
+      random -= type.weight;
     }
     
+    return questionTypes[0].type; // fallback
+  };
+
+  const getUnusedWord = (level) => {
+    const availableWords = wordBank[level].filter(word => !usedWords.includes(word.word));
+    
+    if (availableWords.length === 0) {
+      // If all words have been used, reset the used words list
+      setUsedWords([]);
+      return wordBank[level][Math.floor(Math.random() * wordBank[level].length)];
+    }
+    
+    const randomIndex = Math.floor(Math.random() * availableWords.length);
+    const selectedWord = availableWords[randomIndex];
+    setUsedWords([...usedWords, selectedWord.word]);
+    return selectedWord;
+  };
+
+  const startRound = () => {
+    if (currentQuestionIndex >= questionsPerLevel) {
+      // Move to next level if we've completed all questions
+      if (level < 3) {
+        setLevel(level + 1);
+        speak(`Moving to level ${level + 1}!`);
+      }
+      return;
+    }
+    
+    const newQuestionType = getRandomQuestionType();
+    setQuestionType(newQuestionType);
+    
+    const targetWord = getUnusedWord(level);
+    let questionData = { ...targetWord, type: newQuestionType };
+    let roundOptions = [];
+    let instruction = '';
+    
+    switch (newQuestionType) {
+      case 'letter':
+        instruction = `Find the letter ${targetWord.letter} as in ${targetWord.word}`;
+        roundOptions = generateLetterOptions(3 + level, targetWord.letter);
+        break;
+        
+      case 'sound':
+        instruction = `Which letter makes the sound ${getLetterSound(targetWord.letter)}?`;
+        roundOptions = generateLetterOptions(3 + level, targetWord.letter);
+        break;
+        
+      case 'word':
+        instruction = `Which word starts with the letter ${targetWord.letter}?`;
+        const correctWord = targetWord.word;
+        const otherWords = wordBank[level]
+          .filter(w => w.word !== correctWord)
+          .map(w => w.word);
+        roundOptions = [correctWord, ...getRandomItems(otherWords, 2 + level)];
+        roundOptions = shuffleArray(roundOptions);
+        questionData.correctAnswer = correctWord;
+        break;
+        
+      case 'uppercase':
+        instruction = `Find the lowercase version of ${targetWord.letter}`;
+        roundOptions = generateLetterOptions(3 + level, targetWord.letter.toLowerCase(), true);
+        questionData.correctAnswer = targetWord.letter.toLowerCase();
+        break;
+        
+      case 'missing':
+        const wordWithMissing = targetWord.word.replace(new RegExp(`^${targetWord.letter}`, 'i'), '_');
+        instruction = `Fill in the missing letter: ${wordWithMissing}`;
+        roundOptions = generateLetterOptions(3 + level, targetWord.letter);
+        questionData.wordWithMissing = wordWithMissing;
+        break;
+    }
+    
+    setCurrentQuestion(questionData);
     setOptions(roundOptions);
-    
-    // Speak the instruction
-    const instruction = `Find the letter ${target.letter} as in ${target.word}`;
     speak(instruction);
-    
-    // Reset feedback
     setFeedback(null);
   };
-  
-  const getRandomLetters = (count, correctLetter, includeSimilar = false) => {
+
+  const generateLetterOptions = (count, correctLetter, lowercase = false) => {
     const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     let result = [correctLetter];
     
-    // Map of similar-looking letters
-    const similarLetters = {
-      'B': ['D', 'P', 'R'],
-      'D': ['B', 'P', 'O'],
-      'E': ['F', '3'],
-      'I': ['l', '1', 'J'],
-      'J': ['I', 'T'],
-      'M': ['N', 'W'],
-      'N': ['M', 'Z'],
-      'P': ['B', 'D', 'R'],
-      'Q': ['O', 'G'],
-      'R': ['P', 'B'],
-      'S': ['5', 'Z'],
-      'U': ['V', 'Y'],
-      'V': ['U', 'W'],
-      'W': ['M', 'V'],
-      'Y': ['V', 'U'],
-      'Z': ['N', '2']
-    };
-    
-    // Add similar letters if needed
-    if (includeSimilar && similarLetters[correctLetter]) {
-      const similar = similarLetters[correctLetter];
-      for (let i = 0; i < Math.min(similar.length, count - 1); i++) {
-        result.push(similar[i]);
-      }
-    }
-    
-    // Fill the rest with random letters
     while (result.length < count) {
       const randomLetter = allLetters.charAt(Math.floor(Math.random() * allLetters.length));
-      if (!result.includes(randomLetter)) {
-        result.push(randomLetter);
+      const formattedLetter = lowercase ? randomLetter.toLowerCase() : randomLetter;
+      if (!result.includes(formattedLetter)) {
+        result.push(formattedLetter);
       }
     }
     
-    // Shuffle the options
-    return result.sort(() => Math.random() - 0.5);
+    return shuffleArray(result);
   };
-  
-  const handleLetterClick = (selectedLetter) => {
+
+  const getRandomItems = (array, count) => {
+    const shuffled = [...array].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, Math.min(count - 1, shuffled.length));
+  };
+
+  const shuffleArray = (array) => {
+    return [...array].sort(() => Math.random() - 0.5);
+  };
+
+  const handleOptionClick = (selectedOption) => {
     if (gameOver) return;
     
-    if (selectedLetter === currentLetter.letter) {
-      // Correct answer
-      setScore(score + (level * 10));
+    let isCorrect = false;
+    let correctAnswer = currentQuestion.letter;
+    
+    if (questionType === 'word') {
+      isCorrect = selectedOption === currentQuestion.correctAnswer;
+      correctAnswer = currentQuestion.correctAnswer;
+    } else if (questionType === 'uppercase') {
+      isCorrect = selectedOption === currentQuestion.correctAnswer;
+      correctAnswer = currentQuestion.correctAnswer;
+    } else {
+      isCorrect = selectedOption === correctAnswer;
+    }
+    
+    if (isCorrect) {
+      const pointsEarned = level * 10;
+      setScore(score + pointsEarned);
       setFeedback({
         type: 'success',
-        message: `Correct! That's the letter ${currentLetter.letter} as in ${currentLetter.word}.`
+        message: `Correct! ${getSuccessMessage(currentQuestion)}`
       });
-      speak(`Correct! That's the letter ${currentLetter.letter} as in ${currentLetter.word}.`);
+      speak(`Correct! ${getSuccessMessage(currentQuestion)}`);
       
-      // Check if level should increase
-      if (score + (level * 10) >= level * 50 && level < 3) {
-        setTimeout(() => {
-          setLevel(level + 1);
-          speak(`Great job! Moving to level ${level + 1}`);
-        }, 1500);
+      // Check if we've completed all questions for this level
+      if (currentQuestionIndex + 1 >= questionsPerLevel) {
+        if (level < 3) {
+          setTimeout(() => {
+            setLevel(level + 1);
+            setCurrentQuestionIndex(0);
+            setUsedWords([]);
+            speak(`Great job! Moving to level ${level + 1}`);
+          }, 1500);
+        } else {
+          setTimeout(() => {
+            setFeedback({
+              type: 'success',
+              message: "Congratulations! You've completed all levels!"
+            });
+            speak("Congratulations! You've completed all levels!");
+          }, 1500);
+        }
       } else {
-        setTimeout(startRound, 1500);
+        // Move to next question
+        setTimeout(() => {
+          setCurrentQuestionIndex(prev => prev + 1);
+        }, 1500);
       }
     } else {
-      // Wrong answer
       setLives(lives - 1);
       setFeedback({
         type: 'error',
-        message: `That's not right. Try again! Look for the letter ${currentLetter.letter}.`
+        message: `That's not right. The correct answer is ${correctAnswer}. Try again!`
       });
-      speak(`That's not right. Try again! Look for the letter ${currentLetter.letter}.`);
+      speak(`That's not right. The correct answer is ${correctAnswer}. Try again!`);
       
-      // Check if game over
       if (lives <= 1) {
         setGameOver(true);
         speak("Game over! You can try again to improve your score.");
       }
     }
   };
-  
+
+  const getSuccessMessage = (question) => {
+    switch (question.type) {
+      case 'letter':
+        return `That's the letter ${question.letter} as in ${question.word}.`;
+      case 'sound':
+        return `${question.letter} makes the sound ${getLetterSound(question.letter)}.`;
+      case 'word':
+        return `${question.word} starts with the letter ${question.letter}.`;
+      case 'uppercase':
+        return `${question.letter.toUpperCase()} matches with ${question.letter.toLowerCase()}.`;
+      case 'missing':
+        return `The word is ${question.word} which starts with ${question.letter}.`;
+      default:
+        return 'Great job!';
+    }
+  };
+
   const restartGame = () => {
     setScore(0);
     setLives(3);
     setLevel(1);
+    setCurrentQuestionIndex(0);
     setGameOver(false);
+    setUsedWords([]);
     startRound();
   };
-  
-  const hearLetter = () => {
-    speak(`${currentLetter.letter} as in ${currentLetter.word}`);
+
+  const hearQuestion = () => {
+    switch (questionType) {
+      case 'letter':
+        speak(`Find the letter ${currentQuestion.letter} as in ${currentQuestion.word}`);
+        break;
+      case 'sound':
+        speak(`Which letter makes the sound ${getLetterSound(currentQuestion.letter)}?`);
+        break;
+      case 'word':
+        speak(`Which word starts with the letter ${currentQuestion.letter}?`);
+        break;
+      case 'uppercase':
+        speak(`Find the lowercase version of ${currentQuestion.letter}`);
+        break;
+      case 'missing':
+        speak(`Fill in the missing letter: ${currentQuestion.wordWithMissing}`);
+        break;
+    }
   };
-  
-  if (!currentLetter) return <div>Loading...</div>;
-  
+
+  const changeLevel = (newLevel) => {
+    if (newLevel !== level) {
+      setLevel(newLevel);
+      setCurrentQuestionIndex(0);
+      setUsedWords([]);
+    }
+  };
+
+  if (!currentQuestion) return <div>Loading...</div>;
+
   return (
     <div className="letter-master">
+      <div className="level-buttons">
+        {[1, 2, 3].map(lvl => (
+          <button
+            key={lvl}
+            className={`level-button ${level === lvl ? 'active' : ''}`}
+            onClick={() => changeLevel(lvl)}
+            disabled={gameOver}
+          >
+            Level {lvl}
+          </button>
+        ))}
+      </div>
+      
       <div className="game-stats">
-        <div className="level-indicator">Level: {level}</div>
+        <div className="progress">Question: {currentQuestionIndex + 1} of {questionsPerLevel}</div>
         <div className="score-counter">Score: {score}</div>
         <div className="lives-counter">
           Lives: {Array(lives).fill('❤️').join(' ')}
@@ -193,30 +378,38 @@ const LetterMaster = () => {
       ) : (
         <>
           <div className="letter-challenge">
-            <div className="letter-image-container">
-              <img 
-                src={currentLetter.image} 
-                alt={currentLetter.word}
-                className="letter-image" 
-              />
-              <p className="letter-word">{currentLetter.word}</p>
+            <div className="question-container">
+              {questionType === 'letter' || questionType === 'sound' || questionType === 'missing' ? (
+                <div className="letter-image-container">
+                  <img 
+                    src={currentQuestion.image} 
+                    alt={currentQuestion.word}
+                    className="letter-image" 
+                  />
+                  {questionType === 'missing' ? (
+                    <p className="letter-word">{currentQuestion.wordWithMissing}</p>
+                  ) : (
+                    <p className="letter-word">{currentQuestion.word}</p>
+                  )}
+                </div>
+              ) : null}
+              
+              <div className="question-instructions">
+                <h3>{getQuestionText(currentQuestion)}</h3>
+                <button className="hear-question-button" onClick={hearQuestion}>
+                  Hear Question Again
+                </button>
+              </div>
             </div>
             
-            <div className="letter-instructions">
-              <h3>Find the letter that starts the word</h3>
-              <button className="hear-letter-button" onClick={hearLetter}>
-                Hear the Letter
-              </button>
-            </div>
-            
-            <div className="letter-options">
-              {options.map((letter, index) => (
+            <div className="options-grid">
+              {options.map((option, index) => (
                 <button 
                   key={index}
-                  className="letter-option"
-                  onClick={() => handleLetterClick(letter)}
+                  className="option-button"
+                  onClick={() => handleOptionClick(option)}
                 >
-                  {letter}
+                  {option}
                 </button>
               ))}
             </div>
@@ -231,6 +424,23 @@ const LetterMaster = () => {
       )}
     </div>
   );
+};
+
+const getQuestionText = (question) => {
+  switch (question.type) {
+    case 'letter':
+      return `Find the letter that starts the word:`;
+    case 'sound':
+      return `Which letter makes this sound: ${getLetterSound(question.letter)}?`;
+    case 'word':
+      return `Which word starts with the letter ${question.letter}?`;
+    case 'uppercase':
+      return `Match the lowercase letter for: ${question.letter}`;
+    case 'missing':
+      return `Fill in the missing letter: ${question.wordWithMissing}`;
+    default:
+      return 'Select the correct answer:';
+  }
 };
 
 export default LetterMaster;

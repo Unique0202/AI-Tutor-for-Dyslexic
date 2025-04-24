@@ -1,56 +1,110 @@
 /* ReadingAdventure.css */
 
-/* Base Styles */
 .reading-adventure {
-  font-family: 'Open Dyslexic', 'Comic Sans', Arial, sans-serif;
-  max-width: 1000px;
+  --primary-color: #6c5ce7;
+  --secondary-color: #00cec9;
+  --accent-color: #fd79a8;
+  --dark-bg: #1a1a2e;
+  --darker-bg: #16213e;
+  --card-bg: #0f3460;
+  --text-light: #f0f0f0;
+  --text-lighter: #ffffff;
+  --text-muted: #c9c9c9;
+  --transition-speed: 0.3s;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--dark-bg);
+  color: var(--text-light);
+  min-height: 100vh;
+  line-height: 1.7;
+  padding: 2rem;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 1rem;
-  color: #333;
-  letter-spacing: 0.05em;
-  word-spacing: 0.1em;
-  display: flex;
-  flex-direction: column;
-  min-height: 80vh;
 }
 
-/* Progress Bar */
+.reading-adventure h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-lighter);
+  margin-bottom: 1rem;
+  text-align: center;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Level Buttons - Updated positioning */
+.level-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem; /* Reduced from larger value */
+  padding: 0 1rem;
+}
+
+.level-button {
+  padding: 0.7rem 1.5rem;
+  border-radius: 50px;
+  background-color: var(--card-bg);
+  color: var(--text-light);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+}
+
+.level-button:hover:not(:disabled) {
+  background-color: rgba(108, 92, 231, 0.3);
+}
+
+.level-button.active {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.level-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Progress Bar - Now closer to level buttons */
 .progress-bar {
   width: 100%;
   height: 8px;
-  background-color: #e0e6ed;
+  background-color: var(--card-bg);
   border-radius: 4px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background-color: #4a6fa5;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
   border-radius: 4px;
   transition: width 0.5s ease;
 }
 
 /* Story Container */
 .story-container {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 2rem;
-  flex: 1;
+  margin-bottom: 2rem;
 }
 
 .story-image-container {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  max-height: 400px;
+  flex: 1;
+  min-width: 300px;
 }
 
 .story-image {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
+  border-radius: 12px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  transition: transform var(--transition-speed) ease;
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .story-image:hover {
@@ -58,91 +112,119 @@
 }
 
 .story-text-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  flex: 2;
+  min-width: 300px;
+  background-color: var(--card-bg);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .story-text {
   font-size: 1.2rem;
   line-height: 1.8;
-  background-color: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+  color: var(--text-light);
 }
 
-/* Word Styling */
 .story-word {
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
-  padding: 0 2px;
 }
 
 .story-word:hover {
-  background-color: #f0f4f8;
-  border-radius: 3px;
+  color: var(--secondary-color);
 }
 
 .story-word.highlighted {
-  background-color: #e0f2fe;
-  color: #0369a1;
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+.story-word.reading-highlight {
+  background-color: rgba(0, 206, 201, 0.3);
   border-radius: 3px;
-  font-weight: 600;
+  padding: 0 2px;
 }
 
 /* Word Help Section */
 .word-help {
-  min-height: 80px;
-}
-
-.word-definition {
-  background-color: white;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: var(--darker-bg);
   border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  text-align: center;
+  border-left: 4px solid var(--accent-color);
 }
 
 .focused-word {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #3a5a78;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-color);
   margin-bottom: 0.5rem;
 }
 
 .word-hint {
-  font-size: 1rem;
-  color: #64748b;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.speak-word-button {
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-speed) ease;
+}
+
+.speak-word-button:hover {
+  background-color: #5649d2;
+}
+
+/* Controls Container */
+.controls-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 /* Reading Controls */
 .reading-controls {
   display: flex;
   justify-content: center;
-  margin-top: 1rem;
 }
 
 .read-aloud-button {
-  background-color: #4a6fa5;
-  color: white;
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+  border: none;
+}
+
+.read-aloud-button.play {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.read-aloud-button.stop {
+  background-color: var(--accent-color);
+  color: white;
 }
 
 .read-aloud-button:hover {
-  background-color: #3a5a78;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(74, 111, 165, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 /* Navigation Controls */
@@ -150,29 +232,28 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 2rem;
-  padding: 1rem 0;
+  padding: 1.5rem;
+  background-color: var(--darker-bg);
+  border-radius: 12px;
 }
 
 .nav-button {
-  background-color: white;
-  border: 2px solid #e0e6ed;
-  color: #3a5a78;
-  padding: 0.8rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background-color: var(--card-bg);
+  color: var(--text-light);
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .nav-button:hover:not(.disabled) {
-  background-color: #f0f4f8;
-  border-color: #4a6fa5;
-  color: #4a6fa5;
+  background-color: rgba(108, 92, 231, 0.3);
+  border-color: var(--primary-color);
 }
 
 .nav-button.disabled {
@@ -181,61 +262,48 @@
 }
 
 .page-indicator {
-  font-size: 1rem;
-  color: #64748b;
   font-weight: 600;
-}
-
-/* Accessibility Features */
-.story-word:focus,
-.read-aloud-button:focus,
-.nav-button:focus {
-  outline: 3px solid #4a6fa5;
-  outline-offset: 3px;
+  color: var(--text-light);
 }
 
 /* Responsive Design */
-@media (min-width: 768px) {
-  .story-container {
-    grid-template-columns: 1fr 1fr;
+@media (max-width: 768px) {
+  .reading-adventure {
+    padding: 1.5rem;
   }
   
-  .story-text {
-    font-size: 1.3rem;
+  .reading-adventure h2 {
+    font-size: 1.8rem;
   }
-}
-
-@media (max-width: 480px) {
+  
   .story-text {
     font-size: 1.1rem;
-    padding: 1rem;
   }
   
-  .focused-word {
-    font-size: 1.5rem;
-  }
-  
-  .read-aloud-button {
-    padding: 0.8rem 1.2rem;
-    font-size: 1rem;
+  .navigation-controls {
+    flex-direction: column;
+    gap: 1rem;
   }
   
   .nav-button {
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
+    width: 100%;
+    justify-content: center;
   }
   
-  .nav-button span {
-    display: none;
+  .level-buttons {
+    gap: 0.5rem;
+  }
+  
+  .level-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
   }
 }
 
-/* Animation for Interactive Elements */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.word-definition {
-  animation: fadeIn 0.3s ease-out;
+@media (prefers-reduced-motion) {
+  .story-image:hover,
+  .read-aloud-button:hover,
+  .nav-button:hover {
+    transform: none !important;
+  }
 }
