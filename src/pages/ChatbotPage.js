@@ -18,13 +18,24 @@ const ChatbotPage = () => {
   const [isListening, setIsListening] = useState(false);
   const { speak, settings } = useAccessibility();
   
+    // Scroll to top on initial render
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   // Auto scroll to bottom when new messages arrive
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (messages.length > 1 && !isThinking) {
+      scrollToBottom();
+    }
+  }, [messages, isThinking]);
   
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest' // Changed from 'end' to 'nearest' for less aggressive scrolling
+      });
+    }
   };
   
   const handleInputChange = (e) => {
@@ -60,6 +71,11 @@ const ChatbotPage = () => {
       if (settings.textToSpeechEnabled) {
         speak(botResponse);
       }
+      
+      // Only scroll after bot responds, not after user submits
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
     }, 1500);
   };
   
@@ -150,13 +166,15 @@ const ChatbotPage = () => {
   return (
     <div className="chatbot-page">
       <div className="chatbot-header">
-        <h1 className="chatbot-title">
-          AI Learning Assistant
-          <TextToSpeech text="AI Learning Assistant. Ask me anything about dyslexia, learning, or using this website." />
-        </h1>
-        <p className="chatbot-subtitle">
-          Ask me anything about dyslexia, learning, or using this website
-        </p>
+        <div className="chatbot-title-container">
+          <h1 className="chatbot-title">
+            AI Learning Assistant
+            <TextToSpeech text="AI Learning Assistant. Ask me anything about dyslexia, learning, or using this website." />
+          </h1>
+          <p className="chatbot-subtitle">
+            Ask me anything about dyslexia, learning, or using this website
+          </p>
+        </div>
         <button className="reset-chat-button" onClick={resetChat}>
           <RefreshCw size={16} />
           <span>Reset Chat</span>
@@ -164,7 +182,10 @@ const ChatbotPage = () => {
       </div>
       
       <div className="chat-container">
-        <div className="messages-container">
+        <div className="messages-container" style={{ 
+          justifyContent: messages.length <= 1 ? 'flex-end' : 'flex-start' ,
+          overflowAnchor: 'none' // Add this to prevent auto-scrolling
+        }}>
           {messages.map((message, index) => (
             <div 
               key={index} 
