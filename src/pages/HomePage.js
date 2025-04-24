@@ -87,31 +87,31 @@ const HomePage = () => {
     {
       id: 2,
       text: "As a parent, I've seen remarkable progress in my child's reading abilities since using NeuroLearn. The games make learning fun and engaging.",
-      author: "Sarah Johnson",
+      author: "Mr. Yash Verma",
       role: "Parent"
     },
     {
       id: 3,
       text: "I recommend NeuroLearn to all my students with dyslexia. The multisensory approach really helps them grasp concepts they've struggled with before.",
-      author: "Mr. Thompson",
+      author: "Ms. Patel",
       role: "Special Education Teacher"
     },
     {
       id: 4,
       text: "The AI helper has been a game-changer for my learning. I can get instant explanations when I'm stuck on a word or concept.",
-      author: "Alex, Age 14",
+      author: "Nikhil, Age 14",
       role: "Student"
     },
     {
       id: 5,
       text: "NeuroLearn's progress tracking helps me see exactly where my child needs more support. It's been invaluable for our homeschooling journey.",
-      author: "Dr. Patel",
+      author: "Mr. Gautam",
       role: "Parent & Educator"
     },
     {
       id: 6,
       text: "I used to hate reading because it was so hard. Now I look forward to my NeuroLearn time every day!",
-      author: "Emma, Age 10",
+      author: "Mudita, Age 10",
       role: "Student"
     }
   ];

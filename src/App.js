@@ -8,6 +8,7 @@ import GameDetail from './pages/GameDetail';
 import ChatbotPage from './pages/ChatbotPage';
 import ProfilePage from './pages/ProfilePage';
 import AccessibilityProvider from './contexts/AccessibilityContext';
+import FAQPage from './components/FAQPage';
 import 'regenerator-runtime/runtime';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
               <Route path="/games/:gameId" element={<GameDetail />} />
               <Route path="/chatbot" element={<ChatbotPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/FAQPage" element={<FAQPage />} />
             </Routes>
           </main>
           <Footer />
