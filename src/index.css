@@ -1,3 +1,257 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* Fonts */
+  --font-heading: 'Baloo 2', 'DM Sans', sans-serif;
+  --font-body: 'Comic Neue', 'DM Sans', sans-serif;
+
+  /* Brand colors — Light mode (default) */
+  --color-primary: #4F46E5;
+  --color-primary-light: #818CF8;
+  --color-primary-dark: #3730A3;
+  --color-secondary: #818CF8;
+  --color-success: #22C55E;
+  --color-success-dark: #16A34A;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+
+  /* Backgrounds */
+  --color-bg: #EEF2FF;
+  --color-bg-card: #FFFFFF;
+  --color-bg-muted: #E0E7FF;
+
+  /* Text */
+  --color-text: #312E81;
+  --color-text-muted: #6366F1;
+  --color-text-light: #A5B4FC;
+
+  /* Claymorphism design tokens */
+  --radius-card: 20px;
+  --radius-btn: 14px;
+  --shadow-clay: 4px 4px 0px rgba(79, 70, 229, 0.2), inset 0 1px 0 rgba(255,255,255,0.6);
+  --shadow-clay-hover: 6px 6px 0px rgba(79, 70, 229, 0.25), inset 0 1px 0 rgba(255,255,255,0.6);
+  --border-card: 3px solid rgba(79, 70, 229, 0.15);
+
+  /* Spacing */
+  --max-line-length: 68ch;
+}
+
+/* Global base styles */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 18px;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    line-height: 1.3;
+    color: var(--color-text);
+  }
+
+  p {
+    max-width: var(--max-line-length);
+    text-align: left;
+  }
+
+  /* No italic anywhere — dyslexia-friendly */
+  em, i {
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  /* No justified text */
+  * {
+    text-align: left;
+  }
+
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  button, [role="button"] {
+    cursor: pointer;
+  }
+}
+
+/* OpenDyslexic font for accessibility toggle */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/fonts/OpenDyslexic-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/fonts/OpenDyslexic-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* Accessibility theme overrides */
+body.font-dyslexic,
+body.font-dyslexic * {
+  font-family: 'OpenDyslexic', sans-serif !important;
+}
+
+body.font-size-large {
+  font-size: 20px;
+}
+
+body.font-size-xlarge {
+  font-size: 22px;
+}
+
+body.line-spacing-wide p,
+body.line-spacing-wide li,
+body.line-spacing-wide span {
+  line-height: 2.2;
+  letter-spacing: 0.05em;
+  word-spacing: 0.15em;
+}
+
+/* Dark mode override */
+body.dark-mode {
+  background-color: #1e1b4b;
+  color: #e0e7ff;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4 {
+  color: #e0e7ff;
+}
+
+/* High contrast override */
+body.high-contrast {
+  background-color: #000000;
+  color: #FFFFFF;
+}
+
+body.high-contrast * {
+  border-color: #FFFFFF !important;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Reusable clay card utility */
+@layer components {
+  .clay-card {
+    background-color: var(--color-bg-card);
+    border: var(--border-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-clay);
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+  }
+
+  .clay-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-clay-hover);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0.75rem 1.75rem;
+    background-color: var(--color-primary);
+    color: #ffffff;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: var(--radius-btn);
+    border: 3px solid var(--color-primary-dark);
+    box-shadow: 3px 3px 0px var(--color-primary-dark);
+    cursor: pointer;
+    transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 5px 5px 0px var(--color-primary-dark);
+  }
+
+  .btn-primary:active {
+    transform: translateY(1px);
+    box-shadow: 1px 1px 0px var(--color-primary-dark);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0.75rem 1.75rem;
+    background-color: #ffffff;
+    color: var(--color-primary);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: var(--radius-btn);
+    border: 3px solid var(--color-primary);
+    box-shadow: 3px 3px 0px var(--color-primary);
+    cursor: pointer;
+    transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 5px 5px 0px var(--color-primary);
+  }
+
+  .btn-secondary:active {
+    transform: translateY(1px);
+    box-shadow: 1px 1px 0px var(--color-primary);
+  }
+
+  .btn-success {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0.75rem 1.75rem;
+    background-color: var(--color-success);
+    color: #ffffff;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: var(--radius-btn);
+    border: 3px solid var(--color-success-dark);
+    box-shadow: 3px 3px 0px var(--color-success-dark);
+    cursor: pointer;
+    transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+  }
+
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 5px 5px 0px var(--color-success-dark);
+  }
+
+  .btn-success:active {
+    transform: translateY(1px);
+    box-shadow: 1px 1px 0px var(--color-success-dark);
+  }
+}
