@@ -1,77 +1,45 @@
-import * as tf from '@tensorflow/tfjs';
-import { load as loadQnAModel } from '@tensorflow-models/qna';
+// Sends a message to the Express proxy which calls Gemini API.
+// Returns { text, offline } so the UI can show when AI is not connected.
 
-let model;
-
-// Load model only once
-export async function loadChatbotModel() {
-  try {
-    model = await loadQnAModel();
-    console.log('Chatbot model loaded successfully');
-    return true;
-  } catch (error) {
-    console.error('Error loading chatbot model:', error);
-    return false;
-  }
+const FALLBACK_RESPONSES = {
+  read: "Try reading along while a story is read aloud to you — the Reading Adventure game does exactly that.",
+  letter: "Mixing up b and d is very common in dyslexia. The brain finds it hard to tell apart letters that look like mirror images. Letter Master can help you practise telling them apart.",
+  spell: "In Spell Quest, a word is spoken aloud and you type what you hear. Hints are always available whenever you need them.",
+  word: "Word Builder lets you tap letters to build a word you hear — start with the beginner level!",
+  dyslexia: "Dyslexia means the brain processes written language differently. It has nothing to do with intelligence — many brilliant people are dyslexic.",
+  tip: "Before reading, listen to the text read aloud first. Your brain connects sounds to words much faster that way.",
+  help: "I can help with reading and spelling tips, questions about dyslexia, or how to use the games.",
 }
 
-// Process user input
-export async function getBotResponse(userInput) {
-  if (!model) {
-    const loaded = await loadChatbotModel();
-    if (!loaded) return getLocalResponse(userInput);
-  }
-
-  try {
-    // Use our predefined context about dyslexia learning
-    const context = `
-      NeuroLearn is a dyslexia-friendly learning platform with these modules:
-      1. Reading Adventure - Interactive reading support
-      2. Letter Master - Letter recognition challenges
-      3. Word Builder - Word construction with visual aids
-      4. Spell Quest - Spelling practice games
-      
-      Our teaching methods are based on:
-      - Multisensory learning techniques
-      - Orton-Gillingham principles
-      - Phonemic awareness development
-      - Visual tracking exercises
-    `;
-
-    const answers = await model.findAnswers(userInput, context);
-    
-    if (answers && answers.length > 0) {
-      // Return the most confident answer
-      return answers[0].text;
-    }
-    
-    return getLocalResponse(userInput);
-    
-  } catch (error) {
-    console.error('Error processing question:', error);
-    return getLocalResponse(userInput);
-  }
+function localFallback(text) {
+  const t = text.toLowerCase()
+  if (t.includes('read'))                         return FALLBACK_RESPONSES.read
+  if (t.includes('letter') || t.includes('b and d') || t.includes('d and b')) return FALLBACK_RESPONSES.letter
+  if (t.includes('spell'))                        return FALLBACK_RESPONSES.spell
+  if (t.includes('word') || t.includes('build'))  return FALLBACK_RESPONSES.word
+  if (t.includes('dyslexia') || t.includes('what is')) return FALLBACK_RESPONSES.dyslexia
+  if (t.includes('tip') || t.includes('advice') || t.includes('help me')) return FALLBACK_RESPONSES.tip
+  return FALLBACK_RESPONSES.help
 }
 
-// Local fallback responses (similar to your existing function)
-function getLocalResponse(userInput) {
-  const input = userInput.toLowerCase();
-  
-  if (input.match(/\b(read|reading|book|story)\b/)) {
-    return "Try our 📖 Reading Adventure module! It helps with story comprehension through interactive exercises.";
+export async function sendMessage(userMessage, history = []) {
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: userMessage,
+        conversationHistory: history.map(m => ({ role: m.role, content: m.content })),
+      }),
+      signal: AbortSignal.timeout(10000),
+    })
+
+    if (!res.ok) throw new Error(`Server error ${res.status}`)
+
+    const data = await res.json()
+    return { text: data.response, offline: false }
+  } catch {
+    // Server not running — use offline keyword fallback
+    return { text: localFallback(userMessage), offline: true }
   }
-  if (input.match(/\b(letter|alphabet)\b/)) {
-    return "The 🔠 Letter Master game is perfect for learning letters! It's in the learning games section.";
-  }
-  if (input.match(/\b(word|spell|spelling|vocab)\b/)) {
-    return "Our 🧩 Word Builder and ✨ Spell Quest modules are great for word practice!";
-  }
-  
-  const learningResponses = [
-    "Would you like to try one of our interactive learning modules today?",
-    "I specialize in reading and spelling support. Could you ask about those?",
-    "Our learning games make reading practice fun! Want to try one?"
-  ];
-  
-  return learningResponses[Math.floor(Math.random() * learningResponses.length)];
 }

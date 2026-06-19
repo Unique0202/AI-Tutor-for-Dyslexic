@@ -1,330 +1,273 @@
-import React, { useState } from 'react';
-import { Calendar, BarChart2, Award, Clock, Settings } from 'lucide-react';
-import TextToSpeech from '../components/TextToSpeech';
-import { useAccessibility } from '../contexts/AccessibilityContext';
-import '../styles/ProfilePage.css';
+import React, { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Calendar, BarChart2, Award, Clock, Lock } from 'lucide-react'
+import { useAccessibility } from '../contexts/AccessibilityContext'
+
+const MOCK = {
+  name: 'Your Progress',
+  streak: 5,
+  gamesPlayed: 12,
+  recentGames: [
+    { name: 'Reading Adventure', stars: 3, date: '2025-05-10', duration: '15 min', pct: 85 },
+    { name: 'Letter Master',     stars: 3, date: '2025-05-09', duration: '12 min', pct: 92 },
+    { name: 'Word Builder',      stars: 2, date: '2025-05-08', duration: '18 min', pct: 78 },
+    { name: 'Spell Quest',       stars: 2, date: '2025-05-07', duration: '10 min', pct: 80 },
+  ],
+  achievements: [
+    { title: 'Reading Rookie',  desc: 'Finished your first Reading Adventure',    icon: '📖', date: '2025-05-03' },
+    { title: 'Letter Legend',   desc: 'Reached Level 3 in Letter Master',          icon: '🔤', date: '2025-05-06' },
+    { title: 'Word Wizard',     desc: 'Built 20 words correctly in Word Builder',  icon: '🧩', date: '2025-05-08' },
+    { title: 'Spelling Star',   desc: 'Got a perfect star score in Spell Quest',   icon: '⭐', date: '2025-05-09' },
+  ],
+  locked: [
+    { title: 'Spelling Champion', icon: '🏆' },
+    { title: 'Reading Master',    icon: '📚' },
+    { title: '10-Day Streak',     icon: '🔥' },
+  ],
+  skills: [
+    { skill: 'Reading',            stars: 4, max: 5 },
+    { skill: 'Letter Recognition', stars: 5, max: 5 },
+    { skill: 'Spelling',           stars: 3, max: 5 },
+    { skill: 'Phonics',            stars: 2, max: 5 },
+  ],
+}
+
+const StarRow = ({ filled, max }) => (
+  <div className="flex gap-0.5">
+    {Array.from({ length: max }).map((_, i) => (
+      <span key={i} style={{ color: i < filled ? '#F59E0B' : '#D1D5DB', fontSize: '1.1rem' }}>★</span>
+    ))}
+  </div>
+)
+
+const TABS = [
+  { id: 'progress',     label: 'Progress',      icon: BarChart2 },
+  { id: 'achievements', label: 'Achievements',  icon: Award },
+]
 
 const ProfilePage = () => {
-  const [activeTab, setActiveTab] = useState('progress');
-  const { settings, updateSettings } = useAccessibility();
-  
-  const progressData = {
-    recentGames: [
-      { name: 'Reading Adventure', score: 85, date: '2025-05-10', duration: '15 mins' },
-      { name: 'Letter Master', score: 92, date: '2025-05-09', duration: '12 mins' },
-      { name: 'Word Builder', score: 78, date: '2025-05-08', duration: '18 mins' },
-      { name: 'Spell Quest', score: 80, date: '2025-05-07', duration: '10 mins' }
-    ],
-    achievements: [
-      { title: 'Reading Rookie', description: 'Completed first Reading Adventure', icon: '📚', date: '2025-05-03' },
-      { title: 'Letter Legend', description: 'Mastered Level 3 in Letter Master', icon: '🔤', date: '2025-05-06' },
-      { title: 'Word Wizard', description: 'Built 20 words correctly', icon: '🧩', date: '2025-05-08' },
-      { title: 'Spelling Star', description: 'Perfect score in Spell Quest', icon: '✨', date: '2025-05-09' }
-    ],
-    skillLevels: [
-      { skill: 'Reading', level: 4, max: 5 },
-      { skill: 'Letter Recognition', level: 5, max: 5 },
-      { skill: 'Spelling', level: 3, max: 5 },
-      { skill: 'Vocabulary', level: 4, max: 5 }
-    ],
-    streak: 5
-  };
-  
-  const handleFontChange = (e) => {
-    updateSettings({ dyslexicFont: e.target.checked });
-  };
-  
-  const handleContrastChange = (e) => {
-    updateSettings({ highContrast: e.target.checked });
-  };
-  
-  const handleTextSizeChange = (e) => {
-    updateSettings({ largeText: e.target.checked });
-  };
-  
-  const handleSpacingChange = (e) => {
-    updateSettings({ extraSpacing: e.target.checked });
-  };
-  
-  const handleReadingSpeedChange = (e) => {
-    updateSettings({ readingSpeed: parseFloat(e.target.value) });
-  };
-  
+  const [tab, setTab] = useState('progress')
+  const { reducedMotion } = useAccessibility()
+
   return (
-    <div className="profile-page">
-      <div className="profile-header">
-        <div className="profile-avatar">
-          <span>👤</span>
+    <div className="max-w-5xl mx-auto px-6 py-10" style={{ backgroundColor: 'var(--color-bg)' }}>
+
+      {/* Header */}
+      <motion.div
+        className="clay-card p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-5"
+        initial={reducedMotion ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <div
+          className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shrink-0"
+          style={{ backgroundColor: 'var(--color-bg-muted)' }}
+          aria-hidden="true"
+        >
+          🌟
         </div>
-        <div className="profile-info">
-          <h1 className="profile-name">
-            Mayank's Profile
-            <TextToSpeech text="Mayank's Profile" />
+        <div className="flex-1">
+          <h1
+            className="text-2xl font-extrabold mb-1"
+            style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}
+          >
+            {MOCK.name}
           </h1>
-          <p className="profile-stats">
-            <span className="streak">
-              <Calendar size={16} />
-              {progressData.streak} Day Streak
+          <div className="flex flex-wrap gap-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+            <span className="flex items-center gap-1.5 font-bold">
+              <Calendar size={15} />
+              {MOCK.streak}-day streak
             </span>
-            <span className="total-games">
-              <BarChart2 size={16} />
-              12 Games Played
+            <span className="flex items-center gap-1.5 font-bold">
+              <BarChart2 size={15} />
+              {MOCK.gamesPlayed} games played
             </span>
-          </p>
+          </div>
         </div>
+        <div
+          className="text-xs px-3 py-1.5 rounded-full font-bold"
+          style={{ backgroundColor: 'var(--color-bg-muted)', color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+        >
+          Demo data — sign-in coming soon
+        </div>
+      </motion.div>
+
+      {/* Tabs */}
+      <div className="flex gap-2 mb-8 border-b" style={{ borderColor: 'rgba(79,70,229,0.12)' }}>
+        {TABS.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setTab(id)}
+            className="flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-colors duration-150 cursor-pointer -mb-px"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              borderColor: tab === id ? 'var(--color-primary)' : 'transparent',
+              color: tab === id ? 'var(--color-primary)' : 'var(--color-text-muted)',
+              backgroundColor: 'transparent',
+            }}
+            aria-selected={tab === id}
+          >
+            <Icon size={16} /> {label}
+          </button>
+        ))}
       </div>
-      
-      <div className="profile-tabs">
-        <button 
-          className={`tab-button ${activeTab === 'progress' ? 'active' : ''}`}
-          onClick={() => setActiveTab('progress')}
+
+      {/* Progress Tab */}
+      {tab === 'progress' && (
+        <motion.div
+          key="progress"
+          initial={reducedMotion ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex flex-col gap-10"
         >
-          <BarChart2 size={20} />
-          <span>Progress</span>
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'achievements' ? 'active' : ''}`}
-          onClick={() => setActiveTab('achievements')}
-        >
-          <Award size={20} />
-          <span>Achievements</span>
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'settings' ? 'active' : ''}`}
-          onClick={() => setActiveTab('settings')}
-        >
-          <Settings size={20} />
-          <span>Settings</span>
-        </button>
-      </div>
-      
-      <div className="profile-content">
-        {activeTab === 'progress' && (
-          <div className="progress-section">
-            <div className="skill-levels">
-              <h2 className="section-title">
-                Your Skills
-                <TextToSpeech text="Your Skills" />
-              </h2>
-              
-              <div className="skills-grid">
-                {progressData.skillLevels.map((skill, index) => (
-                  <div key={index} className="skill-card">
-                    <h3 className="skill-name">{skill.skill}</h3>
-                    <div className="skill-level">
-                      <div className="level-indicator">
-                        {Array(skill.max).fill().map((_, i) => (
-                          <span 
-                            key={i} 
-                            className={`level-star ${i < skill.level ? 'filled' : ''}`}
-                          >
-                            ★
-                          </span>
-                        ))}
-                      </div>
-                      <div className="level-text">Level {skill.level}/{skill.max}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="recent-activity">
-              <h2 className="section-title">
-                Recent Activity
-                <TextToSpeech text="Recent Activity" />
-              </h2>
-              
-              <div className="activity-list">
-                {progressData.recentGames.map((game, index) => (
-                  <div key={index} className="activity-card">
-                    <div className="activity-header">
-                      <div className="activity-name">{game.name}</div>
-                      <div className="activity-score">{game.score}%</div>
-                    </div>
-                    <div className="activity-details">
-                      <div className="activity-date">
-                        <Calendar size={14} />
-                        {new Date(game.date).toLocaleDateString()}
-                      </div>
-                      <div className="activity-duration">
-                        <Clock size={14} />
-                        {game.duration}
-                      </div>
-                    </div>
-                    <div className="score-bar">
-                      <div 
-                        className="score-fill" 
-                        style={{ width: `${game.score}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* Skill stars */}
+          <div>
+            <h2
+              className="text-xl font-extrabold mb-5"
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}
+            >
+              Your skills
+            </h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {MOCK.skills.map((s, i) => (
+                <motion.div
+                  key={s.skill}
+                  className="clay-card p-5 flex items-center justify-between"
+                  initial={reducedMotion ? false : { opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.07, duration: 0.35 }}
+                >
+                  <span className="font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}>
+                    {s.skill}
+                  </span>
+                  <StarRow filled={s.stars} max={s.max} />
+                </motion.div>
+              ))}
             </div>
           </div>
-        )}
-        
-        {activeTab === 'achievements' && (
-          <div className="achievements-section">
-            <h2 className="section-title">
-              Your Achievements
-              <TextToSpeech text="Your Achievements" />
+
+          {/* Recent activity */}
+          <div>
+            <h2
+              className="text-xl font-extrabold mb-5"
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}
+            >
+              Recent activity
             </h2>
-            
-            <div className="achievements-grid">
-              {progressData.achievements.map((achievement, index) => (
-                <div key={index} className="achievement-card">
-                  <div className="achievement-icon">{achievement.icon}</div>
-                  <div className="achievement-info">
-                    <h3 className="achievement-title">{achievement.title}</h3>
-                    <p className="achievement-description">{achievement.description}</p>
-                    <div className="achievement-date">
-                      <Calendar size={14} />
-                      {new Date(achievement.date).toLocaleDateString()}
-                    </div>
+            <div className="flex flex-col gap-4">
+              {MOCK.recentGames.map((g, i) => (
+                <motion.div
+                  key={i}
+                  className="clay-card p-5 flex flex-col gap-3"
+                  initial={reducedMotion ? false : { opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.07, duration: 0.35 }}
+                >
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <span className="font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}>
+                      {g.name}
+                    </span>
+                    <StarRow filled={g.stars} max={3} />
                   </div>
+                  <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                    <span className="flex items-center gap-1"><Calendar size={12} /> {new Date(g.date).toLocaleDateString()}</span>
+                    <span className="flex items-center gap-1"><Clock size={12} /> {g.duration}</span>
+                  </div>
+                  {/* Progress bar */}
+                  <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-bg-muted)' }}>
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ backgroundColor: 'var(--color-primary)' }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${g.pct}%` }}
+                      transition={{ duration: 0.7, delay: i * 0.1, ease: 'easeOut' }}
+                    />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Achievements Tab */}
+      {tab === 'achievements' && (
+        <motion.div
+          key="achievements"
+          initial={reducedMotion ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex flex-col gap-10"
+        >
+          <div>
+            <h2
+              className="text-xl font-extrabold mb-5"
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}
+            >
+              Earned badges
+            </h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {MOCK.achievements.map((a, i) => (
+                <motion.div
+                  key={i}
+                  className="clay-card p-5 flex items-start gap-4"
+                  initial={reducedMotion ? false : { opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.08, duration: 0.35 }}
+                >
+                  <div
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0"
+                    style={{ backgroundColor: 'var(--color-bg-muted)' }}
+                    aria-hidden="true"
+                  >
+                    {a.icon}
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}>
+                      {a.title}
+                    </h3>
+                    <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-muted)' }}>{a.desc}</p>
+                    <p className="text-xs mt-1.5 flex items-center gap-1" style={{ color: 'var(--color-text-muted)' }}>
+                      <Calendar size={11} /> {new Date(a.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Locked */}
+          <div>
+            <h2
+              className="text-xl font-extrabold mb-5"
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}
+            >
+              Coming up
+            </h2>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {MOCK.locked.map((l, i) => (
+                <div
+                  key={i}
+                  className="clay-card p-5 flex flex-col items-center gap-3 opacity-60"
+                >
+                  <div
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                    style={{ backgroundColor: 'var(--color-bg-muted)' }}
+                  >
+                    <Lock size={20} style={{ color: 'var(--color-text-muted)' }} />
+                  </div>
+                  <p className="text-sm font-bold text-center" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text-muted)' }}>
+                    {l.title}
+                  </p>
                 </div>
               ))}
             </div>
-            
-            <div className="locked-achievements">
-              <h3>Coming Soon</h3>
-              <div className="locked-grid">
-                <div className="locked-achievement">
-                  <div className="locked-icon">🔒</div>
-                  <div>Spelling Champion</div>
-                </div>
-                <div className="locked-achievement">
-                  <div className="locked-icon">🔒</div>
-                  <div>Reading Master</div>
-                </div>
-                <div className="locked-achievement">
-                  <div className="locked-icon">🔒</div>
-                  <div>10-Day Streak</div>
-                </div>
-              </div>
-            </div>
           </div>
-        )}
-        
-        {activeTab === 'settings' && (
-          <div className="settings-section">
-            <h2 className="section-title">
-              Accessibility Settings
-              <TextToSpeech text="Accessibility Settings" />
-            </h2>
-            
-            <div className="settings-grid">
-              <div className="setting-card">
-                <div className="setting-header">
-                  <h3>Display Settings</h3>
-                </div>
-                
-                <div className="setting-options">
-                  <div className="setting-option">
-                    <label className="setting-label">
-                      <input
-                        type="checkbox"
-                        checked={settings.dyslexicFont}
-                        onChange={handleFontChange}
-                      />
-                      <span>Use Dyslexia-friendly Font</span>
-                    </label>
-                  </div>
-                  
-                  <div className="setting-option">
-                    <label className="setting-label">
-                      <input
-                        type="checkbox"
-                        checked={settings.highContrast}
-                        onChange={handleContrastChange}
-                      />
-                      <span>High Contrast Mode</span>
-                    </label>
-                  </div>
-                  
-                  <div className="setting-option">
-                    <label className="setting-label">
-                      <input
-                        type="checkbox"
-                        checked={settings.largeText}
-                        onChange={handleTextSizeChange}
-                      />
-                      <span>Larger Text Size</span>
-                    </label>
-                  </div>
-                  
-                  <div className="setting-option">
-                    <label className="setting-label">
-                      <input
-                        type="checkbox"
-                        checked={settings.extraSpacing}
-                        onChange={handleSpacingChange}
-                      />
-                      <span>Extra Spacing Between Letters</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="setting-card">
-                <div className="setting-header">
-                  <h3>Text-to-Speech Settings</h3>
-                </div>
-                
-                <div className="setting-options">
-                  <div className="setting-option">
-                    <label className="setting-label">
-                      <input
-                        type="checkbox"
-                        checked={settings.textToSpeechEnabled}
-                        onChange={(e) => updateSettings({ textToSpeechEnabled: e.target.checked })}
-                      />
-                      <span>Enable Text-to-Speech</span>
-                    </label>
-                  </div>
-                  
-                  <div className="setting-option">
-                    <label className="setting-label">
-                      <input
-                        type="checkbox"
-                        checked={settings.speechToTextEnabled}
-                        onChange={(e) => updateSettings({ speechToTextEnabled: e.target.checked })}
-                      />
-                      <span>Enable Speech-to-Text</span>
-                    </label>
-                  </div>
-                  
-                  <div className="setting-option reading-speed">
-                    <label className="setting-label">Reading Speed: {settings.readingSpeed}x</label>
-                    <input
-                      type="range"
-                      min="0.5"
-                      max="2"
-                      step="0.1"
-                      value={settings.readingSpeed}
-                      onChange={handleReadingSpeedChange}
-                      className="reading-speed-slider"
-                    />
-                    <div className="speed-labels">
-                      <span>Slower</span>
-                      <span>Faster</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="settings-save">
-              <button className="save-button">Save Settings</button>
-              <p className="settings-note">Settings are automatically saved and applied across the site.</p>
-            </div>
-          </div>
-        )}
-      </div>
+        </motion.div>
+      )}
     </div>
-  );
-};
+  )
+}
 
-export default ProfilePage;
+export default ProfilePage

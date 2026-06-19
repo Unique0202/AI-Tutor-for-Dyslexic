@@ -1,332 +1,319 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useAccessibility } from '../contexts/AccessibilityContext';
-import { Volume2, Check, RefreshCw } from 'lucide-react';
-import '../styles/SpellQuest.css';
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Volume2, Star } from 'lucide-react'
+import { useAccessibility } from '../contexts/AccessibilityContext'
+import GameWrapper from '../components/GameWrapper'
 
-const SpellQuest = () => {
-  const [currentWord, setCurrentWord] = useState(null);
-  const [userInput, setUserInput] = useState('');
-  const [feedback, setFeedback] = useState(null);
-  const [score, setScore] = useState(0);
-  const [level, setLevel] = useState(1);
-  const [attempts, setAttempts] = useState(0);
-  const [hints, setHints] = useState(3);
-  const [showHint, setShowHint] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [questionsPerLevel, setQuestionsPerLevel] = useState(5);
-  const [usedWords, setUsedWords] = useState([]);
-  const { speak } = useAccessibility();
-  const inputRef = useRef(null);
-  
-  const words = {
-    1: [
-      { word: 'cat', definition: 'A small furry animal with whiskers', hint: 'Begins with C, has 3 letters' },
-      { word: 'dog', definition: 'A pet that barks', hint: 'Begins with D, has 3 letters' },
-      { word: 'sun', definition: 'It shines in the sky during the day', hint: 'Begins with S, has 3 letters' },
-      { word: 'hat', definition: 'You wear it on your head', hint: 'Begins with H, has 3 letters' },
-      { word: 'bed', definition: 'You sleep on it', hint: 'Begins with B, has 3 letters' },
-      { word: 'pen', definition: 'Used for writing', hint: 'Begins with P, has 3 letters' },
-      { word: 'cup', definition: 'You drink from it', hint: 'Begins with C, has 3 letters' },
-      { word: 'key', definition: 'Opens locks', hint: 'Begins with K, has 3 letters' }
-    ],
-    2: [
-      { word: 'fish', definition: 'Lives in water and has fins', hint: 'Begins with F, has 4 letters' },
-      { word: 'book', definition: 'You read stories in it', hint: 'Begins with B, has 4 letters' },
-      { word: 'cake', definition: 'A sweet dessert for birthdays', hint: 'Begins with C, has 4 letters' },
-      { word: 'star', definition: 'Twinkles in the night sky', hint: 'Begins with S, has 4 letters' },
-      { word: 'rain', definition: 'Falls from clouds', hint: 'Begins with R, has 4 letters' },
-      { word: 'bird', definition: 'Flies with wings', hint: 'Begins with B, has 4 letters' },
-      { word: 'moon', definition: 'Shines at night', hint: 'Begins with M, has 4 letters' },
-      { word: 'tree', definition: 'Has leaves and branches', hint: 'Begins with T, has 4 letters' }
-    ],
-    3: [
-      { word: 'house', definition: 'A place where people live', hint: 'Begins with H, has 5 letters' },
-      { word: 'apple', definition: 'A red or green fruit', hint: 'Begins with A, has 5 letters' },
-      { word: 'water', definition: 'You drink it when thirsty', hint: 'Begins with W, has 5 letters' },
-      { word: 'beach', definition: 'Sandy place by the ocean', hint: 'Begins with B, has 5 letters' },
-      { word: 'tiger', definition: 'A big striped cat', hint: 'Begins with T, has 5 letters' },
-      { word: 'music', definition: 'Sounds that make songs', hint: 'Begins with M, has 5 letters' },
-      { word: 'happy', definition: 'Feeling of joy', hint: 'Begins with H, has 5 letters' },
-      { word: 'cloud', definition: 'Floats in the sky', hint: 'Begins with C, has 5 letters' }
-    ]
-  };
-  
+const WORDS = {
+  1: [
+    { word: 'cat', hint: 'A furry pet that meows', emoji: '🐱' },
+    { word: 'dog', hint: 'A pet that barks',       emoji: '🐶' },
+    { word: 'sun', hint: 'Shines in the day sky',  emoji: '☀️' },
+    { word: 'hat', hint: 'Worn on your head',       emoji: '🎩' },
+    { word: 'bed', hint: 'You sleep on it',         emoji: '🛏️' },
+    { word: 'pen', hint: 'Used for writing',        emoji: '✏️' },
+    { word: 'cup', hint: 'You drink from it',       emoji: '☕' },
+    { word: 'bus', hint: 'A big vehicle',           emoji: '🚌' },
+  ],
+  2: [
+    { word: 'fish', hint: 'Lives in water, has fins', emoji: '🐟' },
+    { word: 'book', hint: 'You read stories in it',   emoji: '📚' },
+    { word: 'cake', hint: 'Sweet dessert for birthdays', emoji: '🎂' },
+    { word: 'star', hint: 'Twinkles in the night sky',  emoji: '⭐' },
+    { word: 'rain', hint: 'Falls from clouds',          emoji: '🌧️' },
+    { word: 'bird', hint: 'Flies with wings',           emoji: '🐦' },
+    { word: 'moon', hint: 'Shines at night',            emoji: '🌙' },
+    { word: 'tree', hint: 'Has leaves and branches',    emoji: '🌳' },
+  ],
+  3: [
+    { word: 'house',  hint: 'Where people live',       emoji: '🏠' },
+    { word: 'apple',  hint: 'A red or green fruit',    emoji: '🍎' },
+    { word: 'water',  hint: 'You drink it when thirsty', emoji: '💧' },
+    { word: 'beach',  hint: 'Sandy place by the ocean', emoji: '🏖️' },
+    { word: 'tiger',  hint: 'A big striped cat',       emoji: '🐯' },
+    { word: 'music',  hint: 'Sounds that make songs',  emoji: '🎵' },
+    { word: 'happy',  hint: 'A feeling of joy',        emoji: '😊' },
+    { word: 'cloud',  hint: 'Floats in the sky',       emoji: '☁️' },
+  ],
+}
+
+const QUESTIONS = 5
+const shuffle = arr => [...arr].sort(() => Math.random() - 0.5)
+
+const letterMatch = (typed, target) => {
+  let hits = 0
+  for (let i = 0; i < Math.min(typed.length, target.length); i++) {
+    if (typed[i] === target[i]) hits++
+  }
+  return hits
+}
+
+// ─── Letter feedback row ────────────────────────────────────────────────────
+const LetterBoxes = ({ word, typed }) => (
+  <div className="flex justify-center gap-2 my-2">
+    {word.split('').map((ch, i) => {
+      const userCh = typed[i] || ''
+      const filled = userCh !== ''
+      const correct = userCh === ch
+      return (
+        <div
+          key={i}
+          className="w-11 h-11 rounded-xl flex items-center justify-center font-extrabold text-lg border-2"
+          style={{
+            fontFamily: 'var(--font-heading)',
+            borderColor: !filled ? 'rgba(79,70,229,0.2)'
+              : correct ? '#22C55E' : '#EF4444',
+            backgroundColor: !filled ? 'var(--color-bg-muted)'
+              : correct ? '#DCFCE7' : '#FEF2F2',
+            color: filled ? (correct ? '#16A34A' : '#DC2626') : 'var(--color-text-muted)',
+          }}
+        >
+          {userCh.toUpperCase()}
+        </div>
+      )
+    })}
+  </div>
+)
+
+// ─── Inner game ────────────────────────────────────────────────────────────
+const SpellQuestGame = ({ level, onComplete }) => {
+  const [qIndex, setQIndex] = useState(0)
+  const [queue] = useState(() => shuffle(WORDS[level] || WORDS[1]).slice(0, QUESTIONS))
+  const [typed, setTyped] = useState('')
+  const [feedback, setFeedback] = useState(null) // null | 'correct' | 'wrong' | 'hint'
+  const [hintShown, setHintShown] = useState(false)
+  const [wrongCount, setWrongCount] = useState(0)
+  const inputRef = useRef(null)
+  const mountedRef = useRef(true)
+  const { speak, reducedMotion } = useAccessibility()
+
+  // Cancel speech on unmount
   useEffect(() => {
-    // Reset when level changes
-    setCurrentQuestion(0);
-    setUsedWords([]);
-    startRound();
-  }, [level]);
-  
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+      window.speechSynthesis.cancel()
+    }
+  }, [])
+
+  const wordData = queue[qIndex]
+
+  const speakWord = useCallback(() => {
+    speak(wordData.word)
+  }, [wordData.word, speak])
+
+  // Auto-play audio when word changes — phoneme-first
   useEffect(() => {
-    // Start a new round when current question changes
-    if (currentQuestion < questionsPerLevel) {
-      startRound();
-    }
-  }, [currentQuestion]);
-  
-  useEffect(() => {
-    // Focus on input field when component mounts or when a new word is presented
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [currentWord]);
-  
-  const getUnusedWord = () => {
-    const currentLevelWords = words[level] || words[1];
-    const availableWords = currentLevelWords.filter(wordData => !usedWords.includes(wordData.word));
-    
-    if (availableWords.length === 0) {
-      // If we've used all words, reset the used words list
-      setUsedWords([]);
-      return getUnusedWord();
-    }
-    
-    const randomIndex = Math.floor(Math.random() * availableWords.length);
-    const wordData = availableWords[randomIndex];
-    setUsedWords(prev => [...prev, wordData.word]);
-    return wordData;
-  };
-  
-  const startRound = () => {
-    if (currentQuestion >= questionsPerLevel) {
-      // Move to next level if we've completed all questions
-      if (level < 3) {
-        setLevel(level + 1);
-        speak(`Moving to level ${level + 1}!`);
-      }
-      return;
-    }
-    
-    const wordData = getUnusedWord();
-    setCurrentWord(wordData);
-    
-    // Reset states
-    setUserInput('');
-    setFeedback(null);
-    setAttempts(0);
-    setShowHint(false);
-    
-    // Speak the instruction with the definition
-    speak(`Spell the word that means: ${wordData.definition}`);
-  };
-  
-  const playWordAudio = () => {
-    if (!currentWord) return;
-    speak(currentWord.word);
-  };
-  
-  const handleInputChange = (e) => {
-    setUserInput(e.target.value.toLowerCase());
-  };
-  
-  const showWordHint = () => {
-    if (hints <= 0) return;
-    
-    setHints(hints - 1);
-    setShowHint(true);
-    speak(currentWord.hint);
-  };
-  
-  const checkSpelling = () => {
-    if (!userInput) return;
-    
-    if (userInput === currentWord.word) {
-      // Correct!
-      setFeedback({
-        type: 'success',
-        message: `Great job! "${currentWord.word}" is correct!`
-      });
-      speak(`Great job! ${currentWord.word} is correct!`);
-      
-      const attemptsBonus = attempts === 0 ? 10 : 5;
-      const pointsEarned = (level * 5) + attemptsBonus;
-      setScore(score + pointsEarned);
-      
-      // Check if we've completed all questions for this level
-      if (currentQuestion + 1 >= questionsPerLevel) {
-        if (level < 3) {
-          setTimeout(() => {
-            setLevel(level + 1);
-            setCurrentQuestion(0);
-            setUsedWords([]);
-            speak(`Moving to level ${level + 1}!`);
-          }, 2000);
+    setTyped('')
+    setFeedback(null)
+    setHintShown(false)
+    speak(`Spell the word: ${wordData.hint}. Listen carefully…`)
+    const timer = setTimeout(speakWord, 1800)
+    inputRef.current?.focus()
+    return () => clearTimeout(timer)
+  }, [qIndex, wordData.hint, speak, speakWord])
+
+  const handleCheck = () => {
+    if (!typed.trim()) return
+    const cleaned = typed.trim().toLowerCase()
+    if (cleaned === wordData.word) {
+      setFeedback('correct')
+      speak(`${wordData.word}! Correct! Well done!`)
+      setTimeout(() => {
+        if (!mountedRef.current) return
+        if (qIndex + 1 >= QUESTIONS) {
+          const stars = wrongCount === 0 ? 3 : wrongCount <= 2 ? 2 : 1
+          onComplete(stars, `You spelled all ${QUESTIONS} words! Fantastic!`)
         } else {
-          setTimeout(() => {
-            setFeedback({
-              type: 'success',
-              message: "Congratulations! You've completed all levels!"
-            });
-            speak("Congratulations! You've completed all levels!");
-          }, 3000);
+          setQIndex(i => i + 1)
         }
-      } else {
-        // Move to next question
-        setTimeout(() => {
-          setCurrentQuestion(prev => prev + 1);
-        }, 3000);
-      }
+      }, 1500)
     } else {
-      // Incorrect
-      const newAttempts = attempts + 1;
-      setAttempts(newAttempts);
-      
-      // Check letter by letter to give feedback
-      let correctCount = 0;
-      for (let i = 0; i < userInput.length && i < currentWord.word.length; i++) {
-        if (userInput[i] === currentWord.word[i]) {
-          correctCount++;
-        }
-      }
-      
-      if (newAttempts >= 2) {
-        // Show hint after 2 unsuccessful attempts
-        setShowHint(true);
-      }
-      
-      if (correctCount > 0) {
-        setFeedback({
-          type: 'warning',
-          message: `Almost there! You got ${correctCount} letter${correctCount > 1 ? 's' : ''} right. Try again.`
-        });
-        speak(`Almost there! You got ${correctCount} letter${correctCount > 1 ? 's' : ''} right. Try again.`);
-      } else {
-        setFeedback({
-          type: 'error',
-          message: `That's not right. Try again!`
-        });
-        speak(`That's not right. Try again!`);
-      }
-      
-      // Clear input after 3 attempts and provide more help
-      if (newAttempts >= 3) {
-        setUserInput('');
-        setFeedback({
-          type: 'info',
-          message: `The word starts with "${currentWord.word[0]}". Listen to the word again.`
-        });
-        speak(`The word starts with ${currentWord.word[0]}. Listen to the word again.`);
-        setTimeout(playWordAudio, 1500);
-      }
+      setWrongCount(w => w + 1)
+      const hits = letterMatch(cleaned, wordData.word)
+      const msg = hits > 0
+        ? `Almost! ${hits} letter${hits > 1 ? 's' : ''} in the right place. Try again!`
+        : `Not quite — try again. Listen to the word.`
+      setFeedback('wrong')
+      speak(msg)
+      setTimeout(() => {
+        if (!mountedRef.current) return
+        setFeedback(null)
+        setTyped('')
+        speakWord()
+        inputRef.current?.focus()
+      }, 2000)
     }
-  };
-  
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      checkSpelling();
-    }
-  };
-  
-  const changeLevel = (newLevel) => {
-    if (newLevel !== level) {
-      setLevel(newLevel);
-      setCurrentQuestion(0);
-      setUsedWords([]);
-    }
-  };
-  
-  const skipToNextWord = () => {
-    if (currentQuestion + 1 >= questionsPerLevel) {
-      if (level < 3) {
-        setLevel(level + 1);
-        speak(`Moving to level ${level + 1}!`);
-      }
-    } else {
-      setCurrentQuestion(prev => prev + 1);
-    }
-  };
-  
-  if (!currentWord) return <div>Loading...</div>;
-  
+  }
+
+  const showHint = () => {
+    setHintShown(true)
+    speak(`Hint: ${wordData.hint}. The word starts with ${wordData.word[0].toUpperCase()}.`)
+    setFeedback('hint')
+  }
+
   return (
-    <div className="spell-quest">
-      <div className="level-buttons">
-        {[1, 2, 3].map(lvl => (
-          <button
-            key={lvl}
-            className={`level-button ${level === lvl ? 'active' : ''}`}
-            onClick={() => changeLevel(lvl)}
-          >
-            Level {lvl}
-          </button>
-        ))}
-      </div>
-      
-      <div className="game-info">
-        <div className="progress">Question: {currentQuestion + 1} of {questionsPerLevel}</div>
-        <div className="score-display">Score: {score}</div>
-        <div className="hints-display">Hints: {hints}</div>
-      </div>
-      
-      <div className="spell-challenge">
-        <div className="challenge-header">
-          <h2>Spell the word</h2>
-          <p className="word-definition">{currentWord.definition}</p>
-        </div>
-        
-        <div className="audio-player">
-          <button className="audio-button" onClick={playWordAudio}>
-            <Volume2 size={20} />
-            <span>Listen to the Word</span>
-          </button>
-        </div>
-        
-        <div className="spelling-input">
-          <input
-            ref={inputRef}
-            type="text"
-            value={userInput}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Type your spelling here..."
-            maxLength={currentWord.word.length + 2}
-            className="word-input"
+    <div className="max-w-md mx-auto flex flex-col gap-5 py-4">
+      {/* Progress */}
+      <div className="flex items-center gap-3">
+        <span className="text-xs font-bold shrink-0" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text-muted)' }}>
+          {qIndex + 1} / {QUESTIONS}
+        </span>
+        <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-bg-muted)' }}>
+          <motion.div
+            className="h-full rounded-full"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+            animate={{ width: `${(qIndex / QUESTIONS) * 100}%` }}
+            transition={{ duration: 0.4 }}
           />
-          
-          <div className="input-actions">
-            <button 
-              className="hint-button"
-              onClick={showWordHint}
-              disabled={hints <= 0 || showHint}
-            >
-              Get Hint
-            </button>
-            
-            <button 
-              className="check-button"
-              onClick={checkSpelling}
-              disabled={!userInput}
-            >
-              <Check size={20} />
-              Check
-            </button>
-          </div>
         </div>
-        
-        {showHint && (
-          <div className="hint-display">
-            <p><strong>Hint:</strong> {currentWord.hint}</p>
-          </div>
-        )}
-        
+      </div>
+
+      {/* Word card */}
+      <motion.div
+        key={qIndex}
+        className="clay-card p-7 flex flex-col items-center gap-4 text-center"
+        initial={reducedMotion ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <span style={{ fontSize: '4rem', lineHeight: 1 }}>{wordData.emoji}</span>
+        <p className="text-base" style={{ color: 'var(--color-text-muted)', maxWidth: '30ch' }}>
+          {wordData.hint}
+        </p>
+        <button
+          onClick={speakWord}
+          className="btn-primary flex items-center gap-2 py-3 px-6"
+        >
+          <Volume2 size={18} /> Listen to the word
+        </button>
+      </motion.div>
+
+      {/* Letter boxes */}
+      <LetterBoxes word={wordData.word} typed={typed} />
+
+      {/* Input */}
+      <input
+        ref={inputRef}
+        type="text"
+        value={typed}
+        onChange={e => setTyped(e.target.value)}
+        onKeyDown={e => e.key === 'Enter' && handleCheck()}
+        placeholder={`Type the word (${wordData.word.length} letters)`}
+        maxLength={wordData.word.length + 3}
+        disabled={feedback === 'correct'}
+        className="w-full text-center text-2xl font-extrabold py-4 px-5 rounded-2xl border-3 outline-none"
+        style={{
+          fontFamily: 'var(--font-heading)',
+          backgroundColor: 'var(--color-bg-card)',
+          border: '3px solid rgba(79,70,229,0.2)',
+          color: 'var(--color-text)',
+          letterSpacing: '0.15em',
+        }}
+        aria-label="Type your spelling here"
+      />
+
+      {/* Feedback */}
+      <AnimatePresence>
         {feedback && (
-          <div className={`feedback ${feedback.type}`}>
-            {feedback.message}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="text-center py-3 px-5 rounded-2xl font-bold text-sm"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              backgroundColor: feedback === 'correct' ? '#DCFCE7'
+                : feedback === 'hint' ? '#FEF9C3'
+                : '#FEF2F2',
+              color: feedback === 'correct' ? '#16A34A'
+                : feedback === 'hint' ? '#92400E'
+                : '#DC2626',
+            }}
+          >
+            {feedback === 'correct' && `${wordData.word.toUpperCase()}! Correct!`}
+            {feedback === 'wrong' && `Not quite — listen again and try!`}
+            {feedback === 'hint' && `Hint: starts with ${wordData.word[0].toUpperCase()} — ${wordData.word.length} letters`}
+          </motion.div>
         )}
-        
-        <div className="attempts-counter">
-          Attempts: {attempts} / 3
+      </AnimatePresence>
+
+      {/* Hint */}
+      {hintShown && feedback !== 'hint' && (
+        <div
+          className="text-center py-2 px-4 rounded-xl text-sm"
+          style={{ backgroundColor: '#FEF9C3', color: '#92400E', fontFamily: 'var(--font-body)' }}
+        >
+          Starts with <strong>{wordData.word[0].toUpperCase()}</strong> — {wordData.word.length} letters total
         </div>
-        
-        <button className="next-word-button" onClick={skipToNextWord}>
-          <RefreshCw size={16} />
-          Skip to Next Word
+      )}
+
+      {/* Actions */}
+      <div className="flex gap-3 justify-center flex-wrap">
+        <button
+          onClick={showHint}
+          className="btn-secondary flex items-center gap-2 py-2 px-4"
+          style={{ minHeight: '44px', fontSize: '0.875rem' }}
+        >
+          <Star size={15} /> Get a hint
+        </button>
+        <button
+          onClick={handleCheck}
+          disabled={!typed.trim() || feedback === 'correct'}
+          className="btn-primary py-2 px-6"
+          style={{ minHeight: '44px', fontSize: '0.875rem' }}
+        >
+          Check spelling
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SpellQuest;
+// ─── Public component ──────────────────────────────────────────────────────
+const SpellQuest = () => {
+  const [level, setLevel] = useState(1)
+
+  return (
+    <div className="max-w-md mx-auto px-4 py-4">
+      <div className="flex gap-2 justify-center mb-5">
+        {[1, 2, 3].map(l => (
+          <button
+            key={l}
+            onClick={() => { window.speechSynthesis.cancel(); setLevel(l) }}
+            className="px-5 py-2 rounded-xl font-bold text-sm border-2 cursor-pointer transition-all duration-150"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              backgroundColor: level === l ? 'var(--color-primary)' : 'var(--color-bg-card)',
+              color: level === l ? '#fff' : 'var(--color-primary)',
+              borderColor: 'var(--color-primary)',
+            }}
+          >
+            Level {l}
+          </button>
+        ))}
+      </div>
+
+      <GameWrapper
+        key={level}
+        title="Spell Quest"
+        icon={Volume2}
+        iconColor="#BE185D"
+        iconBg="#FDF2F8"
+        instructions={[
+          'A word will be read out loud automatically.',
+          'Tap the big "Listen" button to hear it again anytime.',
+          'Type the spelling and tap Check.',
+          'Use the Hint button if you need help — no penalty!',
+        ]}
+        ttsText="In Spell Quest, the word plays automatically. Tap Listen to hear it again. Then type the spelling and tap Check. You can use the hint button whenever you need it."
+      >
+        {({ onComplete }) => (
+          <SpellQuestGame key={level} level={level} onComplete={onComplete} />
+        )}
+      </GameWrapper>
+    </div>
+  )
+}
+
+export default SpellQuest

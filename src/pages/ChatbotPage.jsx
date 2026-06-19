@@ -1,289 +1,287 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, Mic, RefreshCw } from 'lucide-react';
-import { useAccessibility } from '../contexts/AccessibilityContext';
-import TextToSpeech from '../components/TextToSpeech';
-import '../styles/ChatbotPage.css';
-import UserIcon from '../assets/user-icon.png'; // Import your user icon image
-import BotIcon from '../assets/bot-icon.png'; // Import your bot icon image
+import React, { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Send, Mic, MicOff, RefreshCw, Brain, User, WifiOff } from 'lucide-react'
+import { useAccessibility } from '../contexts/AccessibilityContext'
+import { sendMessage } from '../chatbotService'
+
+const SUGGESTIONS = [
+  'What is dyslexia?',
+  'Give me a reading tip',
+  'How do I improve my spelling?',
+  'How does Spell Quest work?',
+  'Why is reading hard for me?',
+  'Tell me about Word Sounds',
+]
+
+const WELCOME = "Hi! I am your Learning Helper. I can answer questions about dyslexia, reading, spelling, and the NeuroLearn games. What would you like to know?"
+
+const TypingDots = () => (
+  <div className="flex items-center gap-1 px-1">
+    {[0, 1, 2].map(i => (
+      <motion.span
+        key={i}
+        className="w-2 h-2 rounded-full"
+        style={{ backgroundColor: 'var(--color-primary)' }}
+        animate={{ y: [0, -5, 0] }}
+        transition={{ duration: 0.6, delay: i * 0.15, repeat: Infinity }}
+      />
+    ))}
+  </div>
+)
 
 const ChatbotPage = () => {
-  const [messages, setMessages] = useState([
-    {
-      role: 'bot',
-      content: "Hi there! I'm your AI learning assistant. I can help answer questions about dyslexia, using this website, or general learning tips. What would you like to know?",
-      time: new Date()
-    }
-  ]);
-  const [input, setInput] = useState('');
-  const [isThinking, setIsThinking] = useState(false);
-  const messagesEndRef = useRef(null);
-  const [isListening, setIsListening] = useState(false);
-  const { speak, settings } = useAccessibility();
+  const [messages, setMessages] = useState([{ role: 'bot', content: WELCOME, time: new Date() }])
+  const [input, setInput] = useState('')
+  const [thinking, setThinking] = useState(false)
+  const [listening, setListening] = useState(false)
+  const [isOffline, setIsOffline] = useState(false)
+  const bottomRef = useRef(null)
+  const inputRef = useRef(null)
+  const { speak, settings, reducedMotion } = useAccessibility()
 
-  // Scroll to top on initial render
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-  // Auto scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (messages.length > 1 && !isThinking) {
-      scrollToBottom();
+    bottomRef.current?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' })
+  }, [messages, thinking])
+
+  const addMessage = (role, content) =>
+    setMessages(prev => [...prev, { role, content, time: new Date() }])
+
+  const handleSubmit = async (e) => {
+    e?.preventDefault()
+    const text = input.trim()
+    if (!text || thinking) return
+
+    addMessage('user', text)
+    setInput('')
+    setThinking(true)
+
+    try {
+      const { text: reply, offline } = await sendMessage(text, messages)
+      setIsOffline(offline)
+      addMessage('bot', reply)
+      if (settings.ttsEnabled) speak(reply)
+    } catch {
+      addMessage('bot', "Sorry, I could not connect right now. Please try again in a moment.")
+    } finally {
+      setThinking(false)
+      inputRef.current?.focus()
     }
-  }, [messages, isThinking]);
+  }
 
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest' // Changed from 'end' to 'nearest' for less aggressive scrolling
-      });
-    }
-  };
+  const handleSuggestion = (s) => {
+    setInput(s)
+    inputRef.current?.focus()
+  }
 
-  const handleInputChange = (e) => {
-    setInput(e.target.value);
-  };
+  const startListening = () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SR) return
+    const rec = new SR()
+    rec.lang = 'en-US'
+    rec.onstart = () => setListening(true)
+    rec.onend = () => setListening(false)
+    rec.onerror = () => setListening(false)
+    rec.onresult = e => setInput(e.results[0][0].transcript)
+    rec.start()
+  }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  const reset = () => {
+    setMessages([{ role: 'bot', content: WELCOME, time: new Date() }])
+    setInput('')
+    setIsOffline(false)
+  }
 
-    // Add user message
-    const userMessage = {
-      role: 'user',
-      content: input,
-      time: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setIsThinking(true);
-
-    // Simulate bot thinking
-    setTimeout(() => {
-      const botResponse = generateBotResponse(input.trim());
-      setMessages(prev => [...prev, {
-        role: 'bot',
-        content: botResponse,
-        time: new Date()
-      }]);
-      setIsThinking(false);
-
-      // Read bot's response if text-to-speech is enabled
-      if (settings.textToSpeechEnabled) {
-        speak(botResponse);
-      }
-
-      // Only scroll after bot responds, not after user submits
-      setTimeout(() => {
-        scrollToBottom();
-      }, 100);
-    }, 1500);
-  };
-
-  const generateBotResponse = (userInput) => {
-    // Simple keyword-based responses
-    const userText = userInput.toLowerCase();
-
-    if (userText.includes('hello') || userText.includes('hi') || userText.includes('hey')) {
-      return "Hello! How can I help you today with your learning?";
-    }
-    else if (userText.includes('games') || userText.includes('play')) {
-      return "We have four main games: Reading Adventure helps with reading fluency, Letter Master helps with letter recognition, Word Builder helps with spelling and word formation, and Spell Quest helps with spelling skills. You can access them all from the Games page!";
-    }
-    else if (userText.includes('what is dyslexia') || userText.includes('explain dyslexia')) {
-      return "Dyslexia is a learning difference that affects how the brain processes written and sometimes spoken language. It can make reading, writing, and spelling challenging, but it has nothing to do with intelligence. People with dyslexia often have strengths in creativity, problem-solving, and big-picture thinking!";
-    }
-    else if (userText.includes('help with reading') || userText.includes('reading tips')) {
-      return "Here are some reading tips: 1) Use a ruler or bookmark to keep your place, 2) Try breaking words into smaller parts, 3) Practice reading aloud, 4) Use our Reading Adventure game to practice with support, and 5) Take breaks when you need them - short, focused reading sessions work better than long ones.";
-    }
-    else if (userText.includes('spelling') || userText.includes('spell better')) {
-      return "To improve spelling: 1) Break words into syllables, 2) Look for patterns in words, 3) Use mnemonics to remember tricky words, 4) Practice with our Spell Quest game, and 5) Say the word out loud as you spell it to connect the sounds and letters.";
-    }
-    else if (userText.includes('how to use') || userText.includes('website help')) {
-      return "Our website has four main sections: Games, AI Helper (that's me!), Profile, and Settings. You can use the games to practice different skills, adjust accessibility settings like font size and spacing, and track your progress in your profile. Is there a specific part you need help with?";
-    }
-    else if (userText.includes('settings') || userText.includes('accessibility')) {
-      return "To change settings, click on the gear icon in the top right corner of any page. You can enable dyslexia-friendly font, high contrast mode, larger text, extra spacing between letters, and adjust text-to-speech settings. These features can make reading easier!";
-    }
-    else if (userText.includes('thank') || userText.includes('thanks')) {
-      return "You're welcome! I'm always here to help. Is there anything else you'd like to know?";
-    }
-    else if (userText.includes('frustrated') || userText.includes('difficult') || userText.includes('hard')) {
-      return "It's completely normal to feel frustrated sometimes. Learning with dyslexia can be challenging, but you're doing great by using tools that work for you. Remember that everyone learns differently, and it's okay to take breaks when you need them. What specific challenge are you facing right now?";
-    }
-    else {
-      return "That's a great question! While I'm a simple assistant, I'd recommend trying our Reading Adventure or Word Builder games to practice reading and spelling skills. These games are designed specifically for students with dyslexia. Is there something specific about the website you'd like to know?";
-    }
-  };
-
-  const startSpeechRecognition = () => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert('Speech recognition is not supported in your browser. Try using Chrome or Edge.');
-      return;
-    }
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'en-US';
-
-    recognition.onstart = () => {
-      setIsListening(true);
-    };
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setInput(transcript);
-    };
-
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error', event);
-      setIsListening(false);
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognition.start();
-  };
-
-  const resetChat = () => {
-    setMessages([
-      {
-        role: 'bot',
-        content: "Hi there! I'm your AI learning assistant. I can help answer questions about dyslexia, using this website, or general learning tips. What would you like to know?",
-        time: new Date()
-      }
-    ]);
-  };
-
-  const formatTime = (date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
+  const fmt = d => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
   return (
-    <div className="chatbot-page">
-      <div className="chatbot-header">
-        <div className="chatbot-title-container">
-          <h1 className="chatbot-title">
-            AI Learning Assistant
-            <TextToSpeech text="AI Learning Assistant. Ask me anything about dyslexia, learning, or using this website." />
+    <div
+      className="max-w-3xl mx-auto px-4 py-8 flex flex-col"
+      style={{ minHeight: 'calc(100vh - 5rem)', backgroundColor: 'var(--color-bg)' }}
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between mb-6 gap-4">
+        <div>
+          <h1
+            className="text-2xl md:text-3xl font-extrabold mb-1"
+            style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}
+          >
+            Learning Helper
           </h1>
-          <p className="chatbot-subtitle">
-            Ask me anything about dyslexia, learning, or using this website
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+            Ask about dyslexia, reading, spelling, or the games
           </p>
         </div>
-        <button className="reset-chat-button" onClick={resetChat}>
-          <RefreshCw size={16} />
-          <span>Reset Chat</span>
+        <button
+          onClick={reset}
+          className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border-2 cursor-pointer transition-colors duration-150"
+          style={{
+            fontFamily: 'var(--font-heading)',
+            color: 'var(--color-text-muted)',
+            borderColor: 'rgba(79,70,229,0.2)',
+            backgroundColor: '#fff',
+          }}
+          aria-label="Reset conversation"
+        >
+          <RefreshCw size={13} /> New chat
         </button>
       </div>
 
-      <div className="chat-container">
-        <div className="messages-container" style={{
-          justifyContent: messages.length <= 1 ? 'flex-end' : 'flex-start' ,
-          overflowAnchor: 'none' // Add this to prevent auto-scrolling
-        }}>
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`message ${message.role === 'user' ? 'user-message' : 'bot-message'}`}
-            >
-              <div className="message-avatar">
-                {message.role === 'user' ? (
-                  <img src={UserIcon} alt="User Icon" className="profile-icon" />
-                ) : (
-                  <img src={BotIcon} alt="Bot Icon" className="profile-icon" />
-                )}
-              </div>
-              <div className="message-content">
-                <div className="message-text">{message.content}</div>
-                <div className="message-time">{formatTime(message.time)}</div>
-                {message.role === 'bot' && (
-                  <div className="message-actions">
-                    <TextToSpeech text={message.content} />
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-
-          {isThinking && (
-            <div className="message bot-message">
-              <div className="message-avatar">
-                <img src={BotIcon} alt="Bot Icon" className="profile-icon" />
-              </div>
-              <div className="message-content">
-                <div className="thinking-indicator">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div ref={messagesEndRef} />
+      {/* Offline banner */}
+      {isOffline && (
+        <div
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl mb-4 text-sm font-bold"
+          style={{ backgroundColor: '#FEF9C3', color: '#92400E', border: '2px solid #FDE68A' }}
+        >
+          <WifiOff size={15} />
+          AI is offline — run <code className="mx-1 px-1.5 py-0.5 rounded" style={{ backgroundColor: '#FDE68A' }}>npm run dev</code> in your terminal to connect the AI server.
         </div>
+      )}
 
-        <form className="chat-input" onSubmit={handleSubmit}>
+      {/* Messages */}
+      <div
+        className="flex-1 clay-card p-5 flex flex-col gap-4 overflow-y-auto mb-5"
+        style={{ minHeight: '380px', maxHeight: '56vh' }}
+        aria-live="polite"
+        aria-label="Conversation"
+      >
+        <AnimatePresence initial={false}>
+          {messages.map((msg, i) => {
+            const isBot = msg.role === 'bot'
+            return (
+              <motion.div
+                key={i}
+                initial={reducedMotion ? false : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+                className={`flex items-end gap-3 ${isBot ? '' : 'flex-row-reverse'}`}
+              >
+                {/* Avatar */}
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: isBot ? 'var(--color-primary)' : 'var(--color-bg-muted)' }}
+                  aria-hidden="true"
+                >
+                  {isBot
+                    ? <Brain size={15} color="#fff" />
+                    : <User size={15} style={{ color: 'var(--color-text-muted)' }} />
+                  }
+                </div>
+
+                {/* Bubble */}
+                <div className={`flex flex-col gap-1 max-w-[80%] ${isBot ? 'items-start' : 'items-end'}`}>
+                  <div
+                    className="px-4 py-3 rounded-2xl text-base leading-relaxed"
+                    style={{
+                      backgroundColor: isBot ? 'var(--color-bg-muted)' : 'var(--color-primary)',
+                      color: isBot ? 'var(--color-text)' : '#fff',
+                      borderBottomLeftRadius: isBot ? '4px' : '1rem',
+                      borderBottomRightRadius: isBot ? '1rem' : '4px',
+                    }}
+                  >
+                    {msg.content}
+                  </div>
+                  <span className="text-xs px-1" style={{ color: 'var(--color-text-muted)' }}>
+                    {fmt(msg.time)}
+                  </span>
+                </div>
+              </motion.div>
+            )
+          })}
+        </AnimatePresence>
+
+        {/* Typing indicator */}
+        {thinking && (
+          <motion.div
+            className="flex items-end gap-3"
+            initial={reducedMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+              style={{ backgroundColor: 'var(--color-primary)' }}
+              aria-hidden="true"
+            >
+              <Brain size={15} color="#fff" />
+            </div>
+            <div
+              className="px-4 py-3 rounded-2xl"
+              style={{ backgroundColor: 'var(--color-bg-muted)', borderBottomLeftRadius: '4px' }}
+            >
+              <TypingDots />
+            </div>
+          </motion.div>
+        )}
+
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Suggestions */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {SUGGESTIONS.map(s => (
+          <button
+            key={s}
+            onClick={() => handleSuggestion(s)}
+            className="text-xs font-bold px-3 py-2 rounded-xl border-2 cursor-pointer transition-all duration-150"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              borderColor: 'var(--color-primary)',
+              color: 'var(--color-primary)',
+              backgroundColor: '#fff',
+            }}
+          >
+            {s}
+          </button>
+        ))}
+      </div>
+
+      {/* Input */}
+      <form
+        onSubmit={handleSubmit}
+        className="flex items-center gap-3 clay-card px-4 py-3"
+      >
+        {settings.sttEnabled && (
           <button
             type="button"
-            className={`voice-input-button ${isListening ? 'listening' : ''}`}
-            onClick={startSpeechRecognition}
+            onClick={startListening}
+            aria-label={listening ? 'Stop listening' : 'Start voice input'}
+            className="w-10 h-10 flex items-center justify-center rounded-xl cursor-pointer transition-colors duration-150 shrink-0"
+            style={{
+              backgroundColor: listening ? 'var(--color-danger)' : 'var(--color-bg-muted)',
+              color: listening ? '#fff' : 'var(--color-text-muted)',
+            }}
           >
-            <Mic size={20} />
+            {listening ? <MicOff size={18} /> : <Mic size={18} />}
           </button>
+        )}
 
-          <input
-            type="text"
-            value={input}
-            onChange={handleInputChange}
-            placeholder="Type your question here..."
-            disabled={isThinking}
-          />
+        <input
+          ref={inputRef}
+          type="text"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSubmit()}
+          placeholder="Ask about reading, spelling, or dyslexia..."
+          disabled={thinking}
+          className="flex-1 bg-transparent outline-none text-base"
+          style={{ fontFamily: 'var(--font-body)', color: 'var(--color-text)' }}
+          aria-label="Your message"
+        />
 
-          <button type="submit" className="send-button" disabled={!input.trim() || isThinking}>
-            <Send size={20} />
-          </button>
-        </form>
-      </div>
-
-      <div className="chatbot-suggestions">
-        <h3>Suggested Questions</h3>
-        <div className="suggestion-buttons">
-          <button
-            className="suggestion-button"
-            onClick={() => setInput("What is dyslexia?")}
-          >
-            What is dyslexia?
-          </button>
-          <button
-            className="suggestion-button"
-            onClick={() => setInput("Give me some reading tips")}
-          >
-            Give me some reading tips
-          </button>
-          <button
-            className="suggestion-button"
-            onClick={() => setInput("How can I improve my spelling?")}
-          >
-            How can I improve my spelling?
-          </button>
-          <button
-            className="suggestion-button"
-            onClick={() => setInput("Tell me about the games")}
-          >
-            Tell me about the games
-          </button>
-        </div>
-      </div>
+        <button
+          type="submit"
+          disabled={!input.trim() || thinking}
+          aria-label="Send message"
+          className="w-10 h-10 flex items-center justify-center rounded-xl cursor-pointer transition-all duration-150 shrink-0"
+          style={{
+            backgroundColor: input.trim() && !thinking ? 'var(--color-primary)' : 'var(--color-bg-muted)',
+            color: input.trim() && !thinking ? '#fff' : 'var(--color-text-muted)',
+          }}
+        >
+          <Send size={18} />
+        </button>
+      </form>
     </div>
-  );
-};
+  )
+}
 
-export default ChatbotPage;
+export default ChatbotPage

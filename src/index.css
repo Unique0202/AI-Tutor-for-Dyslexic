@@ -88,17 +88,17 @@
   }
 }
 
-/* OpenDyslexic font for accessibility toggle */
+/* OpenDyslexic font — served locally so it always loads */
 @font-face {
   font-family: 'OpenDyslexic';
-  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/fonts/OpenDyslexic-Regular.otf') format('opentype');
+  src: url('/fonts/OpenDyslexic-Regular.otf') format('opentype');
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'OpenDyslexic';
-  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/fonts/OpenDyslexic-Bold.otf') format('opentype');
+  src: url('/fonts/OpenDyslexic-Bold.otf') format('opentype');
   font-weight: 700;
   font-display: swap;
 }
@@ -125,27 +125,39 @@ body.line-spacing-wide span {
   word-spacing: 0.15em;
 }
 
-/* Dark mode override */
+/* Dark mode — re-scope ALL CSS variables so every component updates */
 body.dark-mode {
-  background-color: #1e1b4b;
-  color: #e0e7ff;
+  --color-bg: #1e1b4b;
+  --color-bg-card: #2d2a6e;
+  --color-bg-muted: #312e81;
+  --color-text: #e0e7ff;
+  --color-text-muted: #a5b4fc;
+  --color-text-light: #6366f1;
+  --border-card: 3px solid rgba(165, 180, 252, 0.15);
+  --shadow-clay: 4px 4px 0px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+  --shadow-clay-hover: 6px 6px 0px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.07);
+
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
-body.dark-mode h1,
-body.dark-mode h2,
-body.dark-mode h3,
-body.dark-mode h4 {
-  color: #e0e7ff;
-}
-
-/* High contrast override */
+/* High contrast — maximum legibility */
 body.high-contrast {
-  background-color: #000000;
-  color: #FFFFFF;
-}
+  --color-bg: #000000;
+  --color-bg-card: #111111;
+  --color-bg-muted: #1a1a1a;
+  --color-text: #ffffff;
+  --color-text-muted: #cccccc;
+  --color-primary: #ffffff;
+  --color-primary-dark: #cccccc;
+  --color-success: #00ff88;
+  --color-success-dark: #00cc66;
+  --border-card: 3px solid #ffffff;
+  --shadow-clay: none;
+  --shadow-clay-hover: none;
 
-body.high-contrast * {
-  border-color: #FFFFFF !important;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 /* Reduced motion */

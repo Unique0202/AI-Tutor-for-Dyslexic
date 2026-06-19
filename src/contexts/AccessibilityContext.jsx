@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react'
+import React, { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react'
 
 const AccessibilityContext = createContext()
 
@@ -56,16 +56,23 @@ const AccessibilityProvider = ({ children }) => {
   const updateSettings = (patch) =>
     setSettings(prev => ({ ...prev, ...patch }))
 
-  const speak = (text, rate = settings.readingSpeed) => {
-    if (!settings.ttsEnabled || !text) return
+  // Keep a ref so speak() always reads current settings without needing them as deps.
+  // This makes speak a stable function (never changes reference) which prevents
+  // infinite useEffect loops in game components that depend on speak.
+  const settingsRef = useRef(settings)
+  settingsRef.current = settings
+
+  const speak = useCallback((text, rate) => {
+    const s = settingsRef.current
+    if (!s.ttsEnabled || !text) return
     window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(text)
-    utterance.rate = rate
+    utterance.rate = rate ?? s.readingSpeed
     utterance.pitch = 1
     window.speechSynthesis.speak(utterance)
-  }
+  }, []) // stable forever — reads live settings via ref
 
-  const stopSpeaking = () => window.speechSynthesis.cancel()
+  const stopSpeaking = useCallback(() => window.speechSynthesis.cancel(), [])
 
   return (
     <AccessibilityContext.Provider

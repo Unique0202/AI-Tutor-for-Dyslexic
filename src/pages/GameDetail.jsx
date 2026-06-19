@@ -1,204 +1,273 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Play, Award, BookOpen } from 'lucide-react';
-import TextToSpeech from '../components/TextToSpeech';
-import { useAccessibility } from '../contexts/AccessibilityContext';
-import ReadingAdventure from '../games/ReadingAdventure';
-import LetterMaster from '../games/LetterMaster';
-import WordBuilder from '../games/WordBuilder';
-import SpellQuest from '../games/SpellQuest';
-import '../styles/GameDetail.css';
+import React, { useState } from 'react'
+import { useParams, Link } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowLeft, Play, CheckCircle, BookOpen, Volume2, Zap, Star, Music } from 'lucide-react'
+import { useAccessibility } from '../contexts/AccessibilityContext'
+import ReadingAdventure from '../games/ReadingAdventure'
+import LetterMaster from '../games/LetterMaster'
+import WordBuilder from '../games/WordBuilder'
+import SpellQuest from '../games/SpellQuest'
+import WordSounds from '../games/WordSounds'
+
+const GAME_DATA = {
+  'reading-adventure': {
+    title: 'Reading Adventure',
+    tagline: 'Listen first. Read along. Go at your own pace.',
+    description: 'Stories come to life with words highlighted as they are read aloud. Tap any word to hear it again. Three levels — start wherever feels right.',
+    icon: BookOpen,
+    iconColor: '#4F46E5',
+    iconBg: '#EEF2FF',
+    skills: ['Reading fluency', 'Word recognition', 'Listening comprehension', 'Vocabulary'],
+    levels: ['Beginner', 'Intermediate', 'Advanced'],
+    component: ReadingAdventure,
+  },
+  'letter-master': {
+    title: 'Letter Master',
+    tagline: 'Hear a sound. Find the letter. Build the connection.',
+    description: 'Letters are shown with their sounds — always audio first. Five question types across three levels to build solid letter-sound knowledge.',
+    icon: Volume2,
+    iconColor: '#0891B2',
+    iconBg: '#ECFEFF',
+    skills: ['Letter-sound connections', 'Phonics', 'Letter recognition', 'Auditory processing'],
+    levels: ['Basic Letters', 'Letter Combinations', 'Challenging Sounds'],
+    component: LetterMaster,
+  },
+  'word-builder': {
+    title: 'Word Builder',
+    tagline: 'Tap letters. Hear sounds. Build words.',
+    description: 'Scrambled letters, a picture for context, and audio guidance. Tap each letter to hear its sound as you build the word.',
+    icon: Zap,
+    iconColor: '#D97706',
+    iconBg: '#FFFBEB',
+    skills: ['Spelling', 'Letter sequencing', 'Sound-to-letter mapping', 'Word formation'],
+    levels: ['Simple Words', 'Compound Words', 'Challenging Vocabulary'],
+    component: WordBuilder,
+  },
+  'spell-quest': {
+    title: 'Spell Quest',
+    tagline: 'Listen carefully. Spell it your way. Hints are always there.',
+    description: 'A word plays out loud — your job is to spell it. Three hints available, no time pressure, and the word replays whenever you need.',
+    icon: Star,
+    iconColor: '#BE185D',
+    iconBg: '#FDF2F8',
+    skills: ['Spelling accuracy', 'Phonological awareness', 'Word memory', 'Auditory processing'],
+    levels: ['Regular Words', 'Pattern Words', 'Irregular Words'],
+    component: SpellQuest,
+  },
+  'word-sounds': {
+    title: 'Word Sounds',
+    tagline: 'Just listen. No reading needed.',
+    description: 'A sound plays — you pick which word starts (or ends, or contains) that sound. Pure phoneme awareness. No letters, no reading, just listening.',
+    icon: Music,
+    iconColor: '#7C3AED',
+    iconBg: '#F5F3FF',
+    skills: ['Phoneme awareness', 'Initial sounds', 'Ending sounds', 'Middle sounds'],
+    levels: ['Initial Sounds', 'Ending Sounds', 'Middle Sounds'],
+    component: WordSounds,
+  },
+}
 
 const GameDetail = () => {
-  const { gameId } = useParams();
-  const [gameData, setGameData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [gameStarted, setGameStarted] = useState(false);
-  const { speak } = useAccessibility();
-  
-  useEffect(() => {
-    const games = {
-      "reading-adventure": {
-        id: "reading-adventure",
-        title: "Reading Adventure",
-        description: "Journey through stories with interactive reading support. Words are highlighted as they're read aloud, and difficult words can be clicked for help.",
-        longDescription: "Reading Adventure is designed to make reading more accessible for students with dyslexia. The game presents stories with words that are highlighted as they're read aloud, helping to reinforce the connection between written words and their sounds. You can click on any difficult word to hear it pronounced clearly and see a visual representation of its meaning. Progress at your own pace and build reading confidence!",
-        image: "https://images.pexels.com/photos/3661193/pexels-photo-3661193.jpeg",
-        skills: ["Reading Comprehension", "Vocabulary", "Word Recognition", "Focus"],
-        benefits: [
-          "Improves reading fluency",
-          "Builds vocabulary",
-          "Enhances comprehension",
-          "Boosts reading confidence"
-        ],
-        levels: ["Beginner", "Intermediate", "Advanced"],
-        component: ReadingAdventure
-      },
-      "letter-master": {
-        id: "letter-master",
-        title: "Letter Master",
-        description: "Master letter recognition and sounds. This game helps students associate letters with their sounds through interactive exercises.",
-        longDescription: "Letter Master helps students master letter recognition and sounds through fun, interactive exercises. The game presents letters in various contexts and asks you to identify them or their sounds. Visual and audio cues provide multi-sensory learning support, making it easier to remember letter shapes and sounds. As you progress, you'll encounter more challenging letter combinations and words.",
-        image: "https://images.pexels.com/photos/591652/play-fun-blocks-block-591652.jpeg",
-        skills: ["Letter Recognition", "Phonics", "Visual Processing", "Auditory Processing"],
-        benefits: [
-          "Strengthens letter-sound connections",
-          "Improves letter recognition speed",
-          "Enhances phonological awareness",
-          "Builds foundation for reading"
-        ],
-        levels: ["Basic Letters", "Letter Combinations", "Challenging Sounds"],
-        component: LetterMaster
-      },
-      "word-builder": {
-        id: "word-builder",
-        title: "Word Builder",
-        description: "Construct words from letters with visual aids. Drag letters to build words, with audio support for letter sounds.",
-        longDescription: "In Word Builder, you'll construct words from individual letters, with helpful visual aids to guide you. Drag and drop letters to form words based on pictures, audio cues, or definitions. As you place each letter, you'll hear its sound, reinforcing the connection between letters and sounds. The game adapts to your skill level, starting with simple three-letter words and progressing to more complex vocabulary.",
-        image: "https://images.pexels.com/photos/5912582/pexels-photo-5912582.jpeg",
-        skills: ["Spelling", "Word Formation", "Letter Sequencing", "Visual-Motor Skills"],
-        benefits: [
-          "Improves spelling skills",
-          "Enhances word formation understanding",
-          "Builds letter-sound association",
-          "Develops sequencing abilities"
-        ],
-        levels: ["Simple Words", "Compound Words", "Challenging Vocabulary"],
-        component: WordBuilder
-      },
-      "spell-quest": {
-        id: "spell-quest",
-        title: "Spell Quest",
-        description: "Practice spelling words with audio guidance. Listen to words and spell them correctly to advance on your quest.",
-        longDescription: "Spell Quest takes you on an adventure where you'll practice spelling words with helpful audio guidance. Listen to words being pronounced clearly, then spell them correctly to advance on your quest. The game provides immediate feedback and extra support for challenging words. Multi-sensory cues help reinforce spelling patterns, and visual rewards keep motivation high as you master increasingly difficult words.",
-        image: "https://images.pexels.com/photos/1153929/pexels-photo-1153929.jpeg",
-        skills: ["Spelling", "Auditory Processing", "Memory", "Phonological Awareness"],
-        benefits: [
-          "Strengthens spelling abilities",
-          "Improves auditory processing",
-          "Enhances word memory",
-          "Builds confidence in writing"
-        ],
-        levels: ["Regular Words", "Pattern Words", "Irregular Words"],
-        component: SpellQuest
-      }
-    };
-    
-    if (games[gameId]) {
-      setGameData(games[gameId]);
-      setIsLoading(false);
-    } else {
-      // Handle invalid game ID
-      setIsLoading(false);
-    }
-  }, [gameId]);
-  
-  const handleStartGame = () => {
-    setGameStarted(true);
-    speak(`Starting ${gameData.title}. Let's learn and have fun!`);
-  };
-  
-  if (isLoading) {
-    return <div className="loading">Loading game details...</div>;
-  }
-  
-  if (!gameData) {
+  const { gameId } = useParams()
+  const [started, setStarted] = useState(false)
+  const { speak, settings, reducedMotion } = useAccessibility()
+
+  const game = GAME_DATA[gameId]
+
+  if (!game) {
     return (
-      <div className="error-container">
-        <h2>Game Not Found</h2>
-        <p>Sorry, we couldn't find the game you're looking for.</p>
-        <Link to="/games" className="btn">Back to Games</Link>
+      <div className="max-w-5xl mx-auto px-6 py-20 flex flex-col items-center gap-6 text-center">
+        <h2 className="text-2xl font-extrabold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}>
+          Game not found
+        </h2>
+        <p style={{ color: 'var(--color-text-muted)' }}>We could not find that game. Try going back to the games list.</p>
+        <Link to="/learn" className="btn-primary">Back to Games</Link>
       </div>
-    );
+    )
   }
-  
-  const GameComponent = gameData.component;
-  
+
+  const Icon = game.icon
+  const GameComponent = game.component
+
+  const handleStart = () => {
+    if (settings.ttsEnabled) speak(`Starting ${game.title}. Let us learn!`)
+    setStarted(true)
+  }
+
   return (
-    <div className="game-detail-page">
-      {!gameStarted ? (
-        <>
-          <div className="game-detail-header">
-            <Link to="/games" className="back-link">
-              <ArrowLeft size={20} />
-              <span>Back to Games</span>
-            </Link>
-            <h1 className="game-detail-title">
-              {gameData.title}
-              <TextToSpeech text={`${gameData.title}. ${gameData.longDescription}`} />
-            </h1>
-          </div>
-          
-          <div className="game-detail-content">
-            <div className="game-detail-image-container">
-              <img src={gameData.image} alt={gameData.title} className="game-detail-image" />
-            </div>
-            
-            <div className="game-detail-info">
-              <p className="game-detail-description">{gameData.longDescription}</p>
-              
-              <div className="game-detail-stats">
-                <div className="game-stat">
-                  <h3 className="stat-title">
-                    <BookOpen size={18} />
-                    <span>Skills Practiced</span>
-                  </h3>
-                  <ul className="stat-list">
-                    {gameData.skills.map((skill, index) => (
-                      <li key={index} className="stat-item">{skill}</li>
-                    ))}
-                  </ul>
+    <AnimatePresence mode="wait">
+      {!started ? (
+        <motion.div
+          key="detail"
+          className="max-w-5xl mx-auto px-6 py-10"
+          initial={reducedMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.35 }}
+        >
+          {/* Back link */}
+          <Link
+            to="/learn"
+            className="inline-flex items-center gap-2 text-sm font-bold mb-8 no-underline"
+            style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+          >
+            <ArrowLeft size={16} /> Back to games
+          </Link>
+
+          <div className="flex flex-col lg:flex-row gap-10">
+            {/* Left — info */}
+            <div className="flex-1 flex flex-col gap-6">
+              {/* Title block */}
+              <div className="flex items-start gap-4">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: game.iconBg }}
+                >
+                  <Icon size={28} style={{ color: game.iconColor }} />
                 </div>
-                
-                <div className="game-stat">
-                  <h3 className="stat-title">
-                    <Award size={18} />
-                    <span>Benefits</span>
-                  </h3>
-                  <ul className="stat-list">
-                    {gameData.benefits.map((benefit, index) => (
-                      <li key={index} className="stat-item">{benefit}</li>
-                    ))}
-                  </ul>
+                <div>
+                  <h1
+                    className="text-2xl md:text-3xl font-extrabold leading-tight"
+                    style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}
+                  >
+                    {game.title}
+                  </h1>
+                  <p className="text-sm font-bold mt-1" style={{ color: game.iconColor, fontFamily: 'var(--font-heading)' }}>
+                    {game.tagline}
+                  </p>
                 </div>
               </div>
-              
-              <div className="game-levels">
-                <h3>Game Levels:</h3>
-                <div className="level-badges">
-                  {gameData.levels.map((level, index) => (
-                    <span key={index} className="level-badge">
-                      {level}
+
+              <p className="text-base leading-relaxed" style={{ color: 'var(--color-text-muted)', maxWidth: '56ch' }}>
+                {game.description}
+              </p>
+
+              {/* Skills */}
+              <div className="clay-card p-5 flex flex-col gap-3">
+                <h3 className="font-extrabold text-sm" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}>
+                  What you will practise
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {game.skills.map(s => (
+                    <span
+                      key={s}
+                      className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl"
+                      style={{
+                        fontFamily: 'var(--font-heading)',
+                        backgroundColor: game.iconBg,
+                        color: game.iconColor,
+                      }}
+                    >
+                      <CheckCircle size={12} /> {s}
                     </span>
                   ))}
                 </div>
               </div>
-              
-              <button className="start-game-button" onClick={handleStartGame}>
-                <Play size={24} />
-                <span>Start Game</span>
-              </button>
+
+              {/* Levels */}
+              <div className="flex flex-col gap-2">
+                <h3 className="font-extrabold text-sm" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}>
+                  Levels
+                </h3>
+                <div className="flex gap-2 flex-wrap">
+                  {game.levels.map((lvl, i) => (
+                    <span
+                      key={lvl}
+                      className="px-4 py-2 rounded-xl text-sm font-bold border-2"
+                      style={{
+                        fontFamily: 'var(--font-heading)',
+                        borderColor: game.iconColor,
+                        color: game.iconColor,
+                        backgroundColor: i === 0 ? game.iconBg : '#fff',
+                      }}
+                    >
+                      {lvl}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right — CTA card */}
+            <div className="lg:w-72 flex flex-col">
+              <div className="clay-card p-7 flex flex-col gap-5 sticky top-24">
+                <div
+                  className="w-full h-32 rounded-2xl flex items-center justify-center"
+                  style={{ backgroundColor: game.iconBg }}
+                >
+                  <Icon size={56} style={{ color: game.iconColor, opacity: 0.6 }} />
+                </div>
+
+                {GameComponent ? (
+                  <button
+                    onClick={handleStart}
+                    className="btn-success flex items-center justify-center gap-2 w-full"
+                  >
+                    <Play size={18} fill="currentColor" /> Start Game
+                  </button>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <div
+                      className="text-center py-3 px-4 rounded-xl text-sm font-bold"
+                      style={{
+                        fontFamily: 'var(--font-heading)',
+                        backgroundColor: 'var(--color-bg-muted)',
+                        color: 'var(--color-text-muted)',
+                      }}
+                    >
+                      Coming soon!
+                    </div>
+                    <p className="text-xs text-center" style={{ color: 'var(--color-text-muted)' }}>
+                      This game is being built right now.
+                    </p>
+                  </div>
+                )}
+
+                <p className="text-xs text-center" style={{ color: 'var(--color-text-muted)' }}>
+                  No sign-in needed. Progress is saved on this device.
+                </p>
+              </div>
             </div>
           </div>
-        </>
+        </motion.div>
       ) : (
-        <div className="game-container">
-          <div className="game-header">
-            <button 
-              className="exit-game-button"
-              onClick={() => setGameStarted(false)}
+        <motion.div
+          key="playing"
+          initial={reducedMotion ? false : { opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          {/* Game top bar */}
+          <div
+            className="sticky top-0 z-20 px-6 py-3 flex items-center gap-4 border-b"
+            style={{
+              backgroundColor: 'var(--color-bg)',
+              borderColor: 'rgba(79,70,229,0.12)',
+            }}
+          >
+            <button
+              onClick={() => { window.speechSynthesis.cancel(); setStarted(false) }}
+              className="btn-secondary flex items-center gap-2 py-2 px-4"
+              style={{ minHeight: '40px', fontSize: '0.875rem' }}
             >
-              <ArrowLeft size={20} />
-              <span>Exit Game</span>
+              <ArrowLeft size={15} /> Exit Game
             </button>
-            <h2 className="game-playing-title">{gameData.title}</h2>
+            <h2
+              className="font-extrabold"
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text)' }}
+            >
+              {game.title}
+            </h2>
           </div>
-          
-          <GameComponent />
-        </div>
-      )}
-    </div>
-  );
-};
 
-export default GameDetail;
+          <div className="max-w-5xl mx-auto px-4 py-6">
+            <GameComponent />
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+export default GameDetail

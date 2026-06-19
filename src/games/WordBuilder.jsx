@@ -1,313 +1,342 @@
-import React, { useState, useEffect } from 'react';
-import { useAccessibility } from '../contexts/AccessibilityContext';
-import { Shuffle, Check, ArrowLeft } from 'lucide-react';
-import '../styles/WordBuilder.css';
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Volume2, Shuffle, RotateCcw } from 'lucide-react'
+import { useAccessibility } from '../contexts/AccessibilityContext'
+import GameWrapper from '../components/GameWrapper'
 
-const WordBuilder = () => {
-  const [currentWord, setCurrentWord] = useState(null);
-  const [scrambledLetters, setScrambledLetters] = useState([]);
-  const [selectedLetters, setSelectedLetters] = useState([]);
-  const [feedback, setFeedback] = useState(null);
-  const [score, setScore] = useState(0);
-  const [level, setLevel] = useState(1);
-  const [hints, setHints] = useState(3);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [questionsPerLevel, setQuestionsPerLevel] = useState(5);
-  const [usedWords, setUsedWords] = useState([]);
-  const { speak } = useAccessibility();
-  
-  const words = {
-    1: [
-      { word: 'CAT', image: 'https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg', hint: 'A furry pet that meows' },
-      { word: 'DOG', image: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg', hint: 'A pet that barks' },
-      { word: 'SUN', image: 'https://images.pexels.com/photos/301599/pexels-photo-301599.jpeg', hint: 'It shines in the sky during the day' },
-      { word: 'HAT', image: 'https://images.pexels.com/photos/984619/pexels-photo-984619.jpeg', hint: 'You wear it on your head' },
-      { word: 'BED', image: 'https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg', hint: 'You sleep on it' },
-      { word: 'CAR', image: 'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg', hint: 'A vehicle with four wheels' },
-      { word: 'BAT', image: 'https://images.pexels.com/photos/247502/pexels-photo-247502.jpeg', hint: 'A flying mammal or sports equipment' },
-      { word: 'PEN', image: 'https://images.pexels.com/photos/606541/pexels-photo-606541.jpeg', hint: 'Used for writing' }
-    ],
-    2: [
-      { word: 'FISH', image: 'https://images.pexels.com/photos/128756/pexels-photo-128756.jpeg', hint: 'It lives in water and has fins' },
-      { word: 'BOOK', image: 'https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg', hint: 'You read stories from it' },
-      { word: 'CAKE', image: 'https://images.pexels.com/photos/264939/pexels-photo-264939.jpeg', hint: 'A sweet dessert for birthdays' },
-      { word: 'STAR', image: 'https://images.pexels.com/photos/1257860/pexels-photo-1257860.jpeg', hint: 'Twinkles in the night sky' },
-      { word: 'BIRD', image: 'https://images.pexels.com/photos/349758/hummingbird-bird-birds-349758.jpeg', hint: 'Flies in the sky with wings' },
-      { word: 'FROG', image: 'https://images.pexels.com/photos/45853/grey-crowned-crane-bird-crane-animal-45853.jpeg', hint: 'Jumps and lives near water' },
-      { word: 'TREE', image: 'https://images.pexels.com/photos/38136/pexels-photo-38136.jpeg', hint: 'Has leaves and branches' },
-      { word: 'RAIN', image: 'https://images.pexels.com/photos/125510/pexels-photo-125510.jpeg', hint: 'Falls from clouds' }
-    ],
-    3: [
-      { word: 'HOUSE', image: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg', hint: 'People live in it' },
-      { word: 'APPLE', image: 'https://images.pexels.com/photos/102104/pexels-photo-102104.jpeg', hint: 'A red or green fruit' },
-      { word: 'WATER', image: 'https://images.pexels.com/photos/40784/drops-of-water-water-nature-liquid-40784.jpeg', hint: 'You drink it when thirsty' },
-      { word: 'BEACH', image: 'https://images.pexels.com/photos/1032650/pexels-photo-1032650.jpeg', hint: 'Sandy place by the ocean' },
-      { word: 'TIGER', image: 'https://images.pexels.com/photos/792381/pexels-photo-792381.jpeg', hint: 'A big striped cat' },
-      { word: 'MUSIC', image: 'https://images.pexels.com/photos/164821/pexels-photo-164821.jpeg', hint: 'Sounds that make songs' },
-      { word: 'FLOWER', image: 'https://images.pexels.com/photos/736230/pexels-photo-736230.jpeg', hint: 'Colorful plant that blooms' },
-      { word: 'GARDEN', image: 'https://images.pexels.com/photos/236047/pexels-photo-236047.jpeg', hint: 'Where plants and flowers grow' }
-    ]
-  };
-  
+const WORDS = {
+  1: [
+    { word: 'CAT', emoji: '🐱', hint: 'A furry pet that meows' },
+    { word: 'DOG', emoji: '🐶', hint: 'A pet that barks' },
+    { word: 'SUN', emoji: '☀️', hint: 'Shines in the sky during the day' },
+    { word: 'HAT', emoji: '🎩', hint: 'You wear it on your head' },
+    { word: 'BED', emoji: '🛏️', hint: 'You sleep on it' },
+    { word: 'CAR', emoji: '🚗', hint: 'A vehicle with four wheels' },
+    { word: 'PEN', emoji: '✏️', hint: 'Used for writing' },
+    { word: 'BUS', emoji: '🚌', hint: 'A big vehicle that carries many people' },
+  ],
+  2: [
+    { word: 'FISH', emoji: '🐟', hint: 'Lives in water and has fins' },
+    { word: 'BOOK', emoji: '📚', hint: 'You read stories from it' },
+    { word: 'CAKE', emoji: '🎂', hint: 'A sweet dessert for birthdays' },
+    { word: 'STAR', emoji: '⭐', hint: 'Twinkles in the night sky' },
+    { word: 'BIRD', emoji: '🐦', hint: 'Flies in the sky with wings' },
+    { word: 'FROG', emoji: '🐸', hint: 'Jumps and lives near water' },
+    { word: 'TREE', emoji: '🌳', hint: 'Has leaves and branches' },
+    { word: 'RAIN', emoji: '🌧️', hint: 'Falls from clouds' },
+  ],
+  3: [
+    { word: 'HOUSE', emoji: '🏠', hint: 'A place where people live' },
+    { word: 'APPLE', emoji: '🍎', hint: 'A red or green fruit' },
+    { word: 'WATER', emoji: '💧', hint: 'You drink it when thirsty' },
+    { word: 'BEACH', emoji: '🏖️', hint: 'Sandy place by the ocean' },
+    { word: 'TIGER', emoji: '🐯', hint: 'A big striped cat' },
+    { word: 'MUSIC', emoji: '🎵', hint: 'Sounds that make songs' },
+    { word: 'SMILE', emoji: '😊', hint: 'What a happy face does' },
+    { word: 'CLOUD', emoji: '☁️', hint: 'Floats in the sky' },
+  ],
+}
+
+const QUESTIONS = 5
+const shuffle = arr => [...arr].sort(() => Math.random() - 0.5)
+
+const getQueue = (level) =>
+  shuffle(WORDS[level] || WORDS[1]).slice(0, QUESTIONS)
+
+// ─── Inner game ────────────────────────────────────────────────────────────
+const WordBuilderGame = ({ level, onComplete }) => {
+  const [qIndex, setQIndex] = useState(0)
+  const [queue] = useState(() => getQueue(level))
+  const [tiles, setTiles] = useState([])
+  const [picked, setPicked] = useState([])
+  const [feedback, setFeedback] = useState(null) // null | 'correct' | 'wrong'
+  const [wrongCount, setWrongCount] = useState(0)
+  const [showHint, setShowHint] = useState(false)
+  const mountedRef = useRef(true)
+  const { speak, reducedMotion } = useAccessibility()
+
+  const wordData = queue[qIndex]
+
+  // Cancel speech on unmount
   useEffect(() => {
-    // Reset when level changes
-    setCurrentQuestion(0);
-    setUsedWords([]);
-    startRound();
-  }, [level]);
-  
-  useEffect(() => {
-    // Start a new round when current question changes
-    if (currentQuestion < questionsPerLevel) {
-      startRound();
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+      window.speechSynthesis.cancel()
     }
-  }, [currentQuestion]);
-  
-  const getRandomWord = () => {
-    const currentLevelWords = words[level] || words[1];
-    const availableWords = currentLevelWords.filter(wordData => !usedWords.includes(wordData.word));
-    
-    if (availableWords.length === 0) {
-      // If we've used all words, reset the used words list
-      setUsedWords([]);
-      return getRandomWord();
-    }
-    
-    const randomIndex = Math.floor(Math.random() * availableWords.length);
-    const wordData = availableWords[randomIndex];
-    setUsedWords(prev => [...prev, wordData.word]);
-    return wordData;
-  };
-  
-  const startRound = () => {
-    if (currentQuestion >= questionsPerLevel) {
-      // Move to next level if we've completed all questions
-      if (level < 3) {
-        setLevel(level + 1);
-        speak(`Moving to level ${level + 1}!`);
-      }
-      return;
-    }
-    
-    const wordData = getRandomWord();
-    setCurrentWord(wordData);
-    
-    // Scramble the letters
-    const letters = wordData.word.split('');
-    const scrambled = [...letters].sort(() => Math.random() - 0.5);
-    
-    // Create letter objects with IDs
-    const scrambledWithIds = scrambled.map((letter, index) => ({
-      id: index,
-      letter,
-      selected: false
-    }));
-    
-    setScrambledLetters(scrambledWithIds);
-    setSelectedLetters([]);
-    setFeedback(null);
-    
-    // Speak the instruction
-    speak(`Build the word for this picture. It has ${letters.length} letters.`);
-  };
-  
-  const shuffleLetters = () => {
-    setScrambledLetters(prev => [...prev].sort(() => Math.random() - 0.5));
-  };
-  
-  const selectLetter = (letter) => {
-    if (letter.selected) return;
-    
-    // Add to selected letters
-    setSelectedLetters(prev => [...prev, letter]);
-    
-    // Mark as selected in scrambled array
-    setScrambledLetters(prev => 
-      prev.map(l => l.id === letter.id ? { ...l, selected: true } : l)
-    );
-    
-    // Speak the letter
-    speak(letter.letter);
-  };
-  
-  const unselectLetter = (index) => {
-    const letter = selectedLetters[index];
-    
-    // Remove from selected
-    setSelectedLetters(prev => prev.filter((_, i) => i !== index));
-    
-    // Mark as unselected in scrambled array
-    setScrambledLetters(prev => 
-      prev.map(l => l.id === letter.id ? { ...l, selected: false } : l)
-    );
-  };
-  
+  }, [])
+
+  const setupRound = useCallback(() => {
+    const letters = wordData.word.split('').map((l, i) => ({ id: i, letter: l, used: false }))
+    setTiles(shuffle(letters))
+    setPicked([])
+    setFeedback(null)
+    setShowHint(false)
+    // Speak word aloud first — phoneme-first approach
+    speak(`${wordData.hint}. The word is ${wordData.word}. Tap the letters to build it.`)
+  }, [wordData, speak])
+
+  useEffect(() => { setupRound() }, [setupRound])
+
+  const selectTile = (tile) => {
+    if (tile.used || feedback === 'correct') return
+    const letter = tile.letter
+    setTiles(prev => prev.map(t => t.id === tile.id ? { ...t, used: true } : t))
+    setPicked(prev => [...prev, tile])
+    speak(letter)
+  }
+
+  const removePicked = (index) => {
+    const tile = picked[index]
+    setPicked(prev => prev.filter((_, i) => i !== index))
+    setTiles(prev => prev.map(t => t.id === tile.id ? { ...t, used: false } : t))
+  }
+
+  const resetPicked = () => {
+    setTiles(prev => prev.map(t => ({ ...t, used: false })))
+    setPicked([])
+  }
+
   const checkWord = () => {
-    const builtWord = selectedLetters.map(l => l.letter).join('');
-    
-    if (builtWord === currentWord.word) {
-      // Correct!
-      setFeedback({
-        type: 'success',
-        message: `Great job! You built the word "${currentWord.word}" correctly!`
-      });
-      speak(`Great job! You built the word ${currentWord.word} correctly!`);
-      setScore(score + (level * 5));
-      
-      // Check if we've completed all questions for this level
-      if (currentQuestion + 1 >= questionsPerLevel) {
-        if (level < 3) {
-          setTimeout(() => {
-            setLevel(level + 1);
-            setCurrentQuestion(0);
-            setUsedWords([]);
-            speak(`Moving to level ${level + 1}!`);
-          }, 5000);
+    const built = picked.map(t => t.letter).join('')
+    if (built === wordData.word) {
+      setFeedback('correct')
+      speak(`${wordData.word}! You got it!`)
+      setTimeout(() => {
+        if (!mountedRef.current) return
+        if (qIndex + 1 >= QUESTIONS) {
+          const stars = wrongCount === 0 ? 3 : wrongCount <= 2 ? 2 : 1
+          onComplete(stars, `You built all ${QUESTIONS} words! Brilliant!`)
         } else {
-          setTimeout(() => {
-            setFeedback({
-              type: 'success',
-              message: "Congratulations! You've completed all levels!"
-            });
-            speak("Congratulations! You've completed all levels!");
-          }, 5000);
+          setQIndex(i => i + 1)
         }
-      } else {
-        // Move to next question
-        setTimeout(() => {
-          setCurrentQuestion(prev => prev + 1);
-        }, 5000);
-      }
+      }, 1400)
     } else {
-      // Incorrect
-      setFeedback({
-        type: 'error',
-        message: `That's not quite right. Try again!`
-      });
-      speak(`That's not quite right. Try again!`);
-      
-      // Reset selected letters
-      setSelectedLetters([]);
-      setScrambledLetters(prev => 
-        prev.map(l => ({ ...l, selected: false }))
-      );
+      setWrongCount(w => w + 1)
+      setFeedback('wrong')
+      speak(`Not quite — let's try again. The word is ${wordData.word}.`)
+      setTimeout(() => {
+        if (!mountedRef.current) return
+        resetPicked()
+        setFeedback(null)
+      }, 1400)
     }
-  };
-  
-  const useHint = () => {
-    if (hints <= 0) return;
-    
-    setHints(hints - 1);
-    speak(currentWord.hint);
-    setFeedback({
-      type: 'info',
-      message: currentWord.hint
-    });
-  };
-  
-  const resetSelection = () => {
-    setSelectedLetters([]);
-    setScrambledLetters(prev => 
-      prev.map(l => ({ ...l, selected: false }))
-    );
-  };
-  
-  const changeLevel = (newLevel) => {
-    if (newLevel !== level) {
-      setLevel(newLevel);
-      setCurrentQuestion(0);
-      setUsedWords([]);
-    }
-  };
-  
-  if (!currentWord) return <div>Loading...</div>;
-  
+  }
+
   return (
-    <div className="word-builder">
-      <div className="level-buttons">
-        {[1, 2, 3].map(lvl => (
-          <button
-            key={lvl}
-            className={`level-button ${level === lvl ? 'active' : ''}`}
-            onClick={() => changeLevel(lvl)}
+    <div className="max-w-lg mx-auto flex flex-col gap-5 py-4">
+      {/* Progress */}
+      <div className="flex items-center gap-3">
+        <span
+          className="text-xs font-bold shrink-0"
+          style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text-muted)' }}
+        >
+          {qIndex + 1} / {QUESTIONS}
+        </span>
+        <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-bg-muted)' }}>
+          <motion.div
+            className="h-full rounded-full"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+            animate={{ width: `${(qIndex / QUESTIONS) * 100}%` }}
+            transition={{ duration: 0.4 }}
+          />
+        </div>
+      </div>
+
+      {/* Word picture card */}
+      <div className="clay-card p-6 flex flex-col items-center gap-3 text-center">
+        <span style={{ fontSize: '4.5rem', lineHeight: 1 }}>{wordData.emoji}</span>
+        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{wordData.hint}</p>
+        <button
+          onClick={() => speak(`The word is ${wordData.word}. ${wordData.hint}`)}
+          className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl cursor-pointer"
+          style={{
+            backgroundColor: 'var(--color-bg-muted)',
+            color: 'var(--color-primary)',
+            fontFamily: 'var(--font-heading)',
+          }}
+        >
+          <Volume2 size={14} /> Hear the word
+        </button>
+      </div>
+
+      {/* Answer slots */}
+      <div>
+        <p
+          className="text-xs font-bold mb-2 text-center"
+          style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text-muted)' }}
+        >
+          Tap letters to build the word
+        </p>
+        <div
+          className="flex justify-center gap-2 min-h-[64px] p-3 rounded-2xl"
+          style={{
+            backgroundColor: 'var(--color-bg-muted)',
+            border: `3px dashed ${feedback === 'correct' ? '#22C55E' : feedback === 'wrong' ? '#EF4444' : 'rgba(79,70,229,0.2)'}`,
+          }}
+        >
+          <AnimatePresence mode="popLayout">
+            {picked.map((tile, i) => (
+              <motion.button
+                key={tile.id}
+                layout
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                onClick={() => removePicked(i)}
+                className="w-12 h-12 rounded-xl font-extrabold text-xl flex items-center justify-center cursor-pointer"
+                style={{
+                  backgroundColor: feedback === 'correct' ? '#22C55E' : 'var(--color-primary)',
+                  color: '#fff',
+                  fontFamily: 'var(--font-heading)',
+                }}
+              >
+                {tile.letter}
+              </motion.button>
+            ))}
+            {picked.length === 0 && (
+              <span className="text-sm self-center" style={{ color: 'var(--color-text-muted)' }}>
+                Tap letters below
+              </span>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Feedback */}
+      <AnimatePresence>
+        {feedback && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="text-center py-3 px-5 rounded-2xl font-bold text-sm"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              backgroundColor: feedback === 'correct' ? '#DCFCE7' : '#FEF2F2',
+              color: feedback === 'correct' ? '#16A34A' : '#DC2626',
+            }}
           >
-            Level {lvl}
+            {feedback === 'correct'
+              ? `${wordData.word}! You got it!`
+              : `Not quite — let's try again!`}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Hint */}
+      {showHint && (
+        <div
+          className="text-center py-2 px-4 rounded-xl text-sm"
+          style={{ backgroundColor: '#FEF9C3', color: '#92400E', fontFamily: 'var(--font-body)' }}
+        >
+          The word has {wordData.word.length} letters: <strong>{wordData.word[0]}...</strong>
+        </div>
+      )}
+
+      {/* Available letter tiles */}
+      <div className="flex flex-wrap justify-center gap-2">
+        {tiles.map(tile => (
+          <motion.button
+            key={tile.id}
+            onClick={() => selectTile(tile)}
+            disabled={tile.used || feedback === 'correct'}
+            whileHover={reducedMotion ? {} : { scale: tile.used ? 1 : 1.05 }}
+            whileTap={reducedMotion ? {} : { scale: 0.95 }}
+            className="w-12 h-12 rounded-xl font-extrabold text-xl flex items-center justify-center cursor-pointer transition-colors duration-100"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              backgroundColor: tile.used ? 'var(--color-bg-muted)' : 'var(--color-bg-card)',
+              color: tile.used ? 'transparent' : 'var(--color-text)',
+              border: `3px solid ${tile.used ? 'rgba(79,70,229,0.08)' : 'rgba(79,70,229,0.2)'}`,
+              boxShadow: tile.used ? 'none' : 'var(--shadow-clay)',
+            }}
+          >
+            {tile.used ? '' : tile.letter}
+          </motion.button>
+        ))}
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex gap-3 justify-center flex-wrap">
+        <button
+          onClick={() => { setShowHint(true); speak(wordData.hint) }}
+          className="btn-secondary flex items-center gap-2 py-2 px-4"
+          style={{ minHeight: '44px', fontSize: '0.875rem' }}
+        >
+          Get hint
+        </button>
+        <button
+          onClick={() => setTiles(prev => shuffle([...prev]))}
+          className="btn-secondary flex items-center gap-2 py-2 px-4"
+          style={{ minHeight: '44px', fontSize: '0.875rem' }}
+        >
+          <Shuffle size={15} /> Shuffle
+        </button>
+        <button
+          onClick={resetPicked}
+          className="btn-secondary flex items-center gap-2 py-2 px-4"
+          style={{ minHeight: '44px', fontSize: '0.875rem' }}
+        >
+          <RotateCcw size={15} /> Clear
+        </button>
+        <button
+          onClick={checkWord}
+          disabled={picked.length !== wordData.word.length || feedback === 'correct'}
+          className="btn-success flex items-center gap-2 py-2 px-4"
+          style={{ minHeight: '44px', fontSize: '0.875rem', opacity: picked.length !== wordData.word.length ? 0.5 : 1 }}
+        >
+          Check word
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ─── Public component ──────────────────────────────────────────────────────
+const WordBuilder = () => {
+  const [level, setLevel] = useState(1)
+
+  return (
+    <div className="max-w-lg mx-auto px-4 py-4">
+      <div className="flex gap-2 justify-center mb-5">
+        {[1, 2, 3].map(l => (
+          <button
+            key={l}
+            onClick={() => { window.speechSynthesis.cancel(); setLevel(l) }}
+            className="px-5 py-2 rounded-xl font-bold text-sm border-2 cursor-pointer transition-all duration-150"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              backgroundColor: level === l ? 'var(--color-primary)' : 'var(--color-bg-card)',
+              color: level === l ? '#fff' : 'var(--color-primary)',
+              borderColor: 'var(--color-primary)',
+            }}
+          >
+            Level {l}
           </button>
         ))}
       </div>
-      
-      <div className="game-status">
-        <div className="progress">Question: {currentQuestion + 1} of {questionsPerLevel}</div>
-        <div className="score">Score: {score}</div>
-        <div className="hints">Hints: {hints}</div>
-      </div>
-      
-      <div className="word-challenge">
-        <div className="image-container">
-          <img src={currentWord.image} alt="Word to build" className="challenge-image" />
-        </div>
-        
-        <div className="word-building-area">
-          <div className="selected-letters">
-            {selectedLetters.length === 0 ? (
-              <div className="empty-selection">Select letters to build the word</div>
-            ) : (
-              selectedLetters.map((letter, index) => (
-                <div 
-                  key={`selected-${index}`} 
-                  className="selected-letter"
-                  onClick={() => unselectLetter(index)}
-                >
-                  {letter.letter}
-                </div>
-              ))
-            )}
-          </div>
-          
-          <div className="letter-actions">
-            <button className="action-button hint-button" onClick={useHint} disabled={hints <= 0}>
-              Get Hint
-            </button>
-            <button className="action-button reset-button" onClick={resetSelection}>
-              <ArrowLeft size={20} />
-              Reset
-            </button>
-            <button className="action-button shuffle-button" onClick={shuffleLetters}>
-              <Shuffle size={20} />
-              Shuffle
-            </button>
-          </div>
-          
-          <div className="available-letters">
-            {scrambledLetters.map((letter) => (
-              <div 
-                key={`scrambled-${letter.id}`}
-                className={`letter-tile ${letter.selected ? 'used' : ''}`}
-                onClick={() => !letter.selected && selectLetter(letter)}
-              >
-                {letter.selected ? '' : letter.letter}
-              </div>
-            ))}
-          </div>
-          
-          <button 
-            className="check-button"
-            onClick={checkWord}
-            disabled={selectedLetters.length !== currentWord.word.length}
-          >
-            <Check size={20} />
-            Check Word
-          </button>
-        </div>
-      </div>
-      
-      {feedback && (
-        <div className={`feedback ${feedback.type}`}>
-          {feedback.message}
-        </div>
-      )}
-    </div>
-  );
-};
 
-export default WordBuilder;
+      <GameWrapper
+        key={level}
+        title="Word Builder"
+        icon={Shuffle}
+        iconColor="#D97706"
+        iconBg="#FFFBEB"
+        instructions={[
+          'You will see a picture and hear what the word is.',
+          'Tap the letters at the bottom to build the word.',
+          'Tap a letter you placed to remove it.',
+          'Use the hint button anytime — no limit!',
+        ]}
+        ttsText="In Word Builder, you will see a picture and hear the word. Tap the letters to build the word. Tap any letter you placed to remove it. Use the hint button whenever you need help."
+      >
+        {({ onComplete }) => (
+          <WordBuilderGame key={level} level={level} onComplete={onComplete} />
+        )}
+      </GameWrapper>
+    </div>
+  )
+}
+
+export default WordBuilder
