@@ -1,14 +1,4 @@
-require('dotenv').config()
-
-const express = require('express')
-const cors    = require('cors')
-const Groq    = require('groq-sdk')
-
-const app  = express()
-const PORT = process.env.PORT || 3001
-
-app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:5173'] }))
-app.use(express.json())
+const Groq = require('groq-sdk')
 
 const SYSTEM_PROMPT = `You are a warm, encouraging learning helper on NeuroLearn — an app for children with dyslexia aged 6 to 16.
 
@@ -37,22 +27,21 @@ THE NEUROLEARN GAMES (explain these when asked):
 - Reading Adventure: A story reads itself aloud. Words highlight as they are spoken. Tap any word to hear it by itself.
 - Word Sounds: You hear a sound like "buh". Tap the picture whose word starts with that sound.`
 
-app.post('/api/chat', async (req, res) => {
+module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+
+  if (req.method === 'OPTIONS') return res.status(200).end()
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+
   const { message, conversationHistory = [] } = req.body
 
-  if (!message?.trim()) {
-    return res.status(400).json({ error: 'Message is required' })
-  }
-
-  if (!process.env.GROQ_API_KEY) {
-    console.error('[server] GROQ_API_KEY is not set in .env')
-    return res.status(500).json({ error: 'API key not configured' })
-  }
+  if (!message?.trim()) return res.status(400).json({ error: 'Message is required' })
 
   try {
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
-    // Build message history — drop leading bot messages, keep alternating pairs
     const raw = conversationHistory.slice(-12)
     const firstUserIdx = raw.findIndex(m => m.role === 'user')
     const priorTurns = firstUserIdx === -1
@@ -76,18 +65,9 @@ app.post('/api/chat', async (req, res) => {
     const text = response.choices[0]?.message?.content?.trim()
       || "I am here to help! Ask me about reading, spelling, dyslexia, or the games."
 
-    res.json({ response: text })
+    res.status(200).json({ response: text })
   } catch (err) {
-    console.error('[server] Groq error:', err.message)
+    console.error('[api/chat] Groq error:', err.message)
     res.status(500).json({ error: 'AI service unavailable' })
   }
-})
-
-app.get('/api/health', (_req, res) => res.json({ ok: true }))
-
-app.listen(PORT, () => {
-  console.log(`NeuroLearn API  →  http://localhost:${PORT}`)
-  if (!process.env.GROQ_API_KEY) {
-    console.warn('⚠  GROQ_API_KEY missing — add it to .env')
-  }
-})
+}

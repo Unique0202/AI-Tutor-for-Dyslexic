@@ -1,4 +1,4 @@
-// Sends a message to the Express proxy which calls Gemini API.
+// Sends a message to the Express proxy which calls the Groq API (Llama 3).
 // Returns { text, offline } so the UI can show when AI is not connected.
 
 const FALLBACK_RESPONSES = {
